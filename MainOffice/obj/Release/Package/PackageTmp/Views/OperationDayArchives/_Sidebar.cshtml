@@ -1,0 +1,99 @@
+﻿@model MainOffice.Models.OperationDayArchiveFilter
+@using MainOffice.App_LocalResources;
+@using MainOffice.Helpers
+@{
+    var metaData = ModelMetadataProviders
+    .Current
+    .GetMetadataForType(null, typeof(MainOffice.Models.OperationDayArchive));
+    Dictionary<string, ModelMetadata> properties = metaData.Properties.ToDictionary(p => p.PropertyName);
+}    
+
+<div class="sidebar-header text-center">
+    <h6>@GlobalRes.FilterTitle</h6>
+</div>
+
+@using (Ajax.BeginForm("Filter", null, new AjaxOptions { OnSuccess = "onSuccessFilter" },new { @class = "needs-validation" }))
+{
+
+    <div class="sidebar-body">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					<div class="form-group">
+						@Html.Label(properties["Salon"].DisplayName, new { @for = "SalonId" })
+						@Html.ListBoxFor(model => model.SalonIdSelected, (MultiSelectList)ViewBag.SalonsSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+									@Html.Label(properties["OperationDate"].DisplayName, new { @for = "OperationDate" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.OperationDateFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.OperationDateFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.OperationDateFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.OperationDateTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.OperationDateTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.OperationDateTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+						@Html.Label(properties["OpenOperationPoint"].DisplayName, new { @for = "OpenOperationPoint" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.OpenOperationPointFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.OpenOperationPointFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.OpenOperationPointFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.OpenOperationPointTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.OpenOperationPointTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.OpenOperationPointTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+						@Html.Label(properties["CloseOperationPoint"].DisplayName, new { @for = "CloseOperationPoint" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.CloseOperationPointFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.CloseOperationPointFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.CloseOperationPointFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.CloseOperationPointTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.CloseOperationPointTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.CloseOperationPointTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+</div>
+    <div class="sidebar-footer">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+    </div>
+}

@@ -1,0 +1,101 @@
+﻿@model List<MainOffice.Models.OperDayStatisticsViewModel>
+@using MainOffice.Helpers
+@{
+    ViewBag.Title = "Статистика Опер День";
+}
+
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col" colspan="11">@GlobalRes.OperationDayArchiveShortNameList</th>
+            </tr>
+            <tr>
+                <th scope="col">№</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].OperationDate)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].Salon)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].OpenTime)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].OpenEmployee)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].StaffQuantity)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].StaffQuantityBuisy)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].SummClosed)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].SummInWork)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].BOQuantity)</th>
+                <th scope="col">Детально</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <th>@(i + 1)</th>
+                    <td>
+                        @Html.DisplayFor(model => model[i].OperationDate)
+                        @if (Model[i].Alarm)
+                        {
+                            <button class="btn btn-outline-danger" id="@("popAlarm" + Model[i].Id)" data-toggle="popover">В салоне сейчас проверка</button>
+                            <div class="d-none" id="@("popAlarm" + Model[i].Id + "content")">
+                                @if (User.IsInRole("director") | User.IsInRole("admin"))
+                                { 
+                                    @Ajax.CustomActionLink("Проверка окончена","DisableAlarm", "OperDayStatistics", new { Id = Model[i].Id }, new AjaxOptions() { Confirm = "Вы уверенны, что проверка закончилась ?", HttpMethod = "Post", OnFailure = "onFail", OnSuccess = "onSuccessAlarm" }, new { @class = "btn btn-outline-success"}, "fas fa-spinner fa-pulse")
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(model => model[i].Salon)</td>
+                    <td>@Html.DisplayFor(model => model[i].OpenTime)</td>
+                    <td>@Html.DisplayFor(model => model[i].OpenEmployee)</td>
+                    <td>@Html.DisplayFor(model => model[i].StaffQuantity)</td>
+                    <td>@Html.DisplayFor(model => model[i].StaffQuantityBuisy)</td>
+                    <td>
+                        <button class="btn btn-outline-info" id="@("popSumm" + Model[i].Id)" data-toggle="popover">@Html.DisplayFor(model => model[i].SummClosed)</button> 
+                        <div class="d-none" id="@("popSumm" + Model[i].Id + "content")">
+                            <table class="table-sm">
+                                <thead>
+                                    <tr class="text-info">
+                                        <th scope="col">@Html.DisplayNameFor(model => model[0].KasaSumm)</th>
+                                        <th scope="col">@Html.DisplayNameFor(model => model[0].TerminalSumm)</th>
+                                        <th scope="col">@Html.DisplayNameFor(model => model[0].DepositSumm)</th>
+                                        <th scope="col">@Html.DisplayNameFor(model => model[0].UnpaidSumm)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>@Html.DisplayFor(model => model[i].KasaSumm)</td>
+                                        <td>@Html.DisplayFor(model => model[i].TerminalSumm)</td>
+                                        <td>@Html.DisplayFor(model => model[i].DepositSumm)</td>
+                                        <td>@Html.DisplayFor(model => model[i].UnpaidSumm)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td>@Html.DisplayFor(model => model[i].SummInWork)</td>
+                    <td>@Html.DisplayFor(model => model[i].BOQuantity)</td>
+                    <td>
+                        @Html.ActionLink("Детально", "Details", new { Id = Model[i].Id }, new { @class = "btn btn-outline-info" })
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>
+@section scripts {
+    <script type="text/javascript">
+        $('[data-toggle="popover"]').popover({
+            trigger: 'focus',
+            content: function () { return $('#' + this.id + 'content').html() },
+            html: true,
+            sanitize: false,
+            placement: 'top'
+        });
+        function onFail(xhr) {
+            alert('Действие не выполнено. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status)
+        }
+        function onSuccessAlarm(xhr) {
+            var element = document.getElementById("popAlarm" + xhr.data);
+            element.parentNode.removeChild(element);
+        }
+    </script>
+}

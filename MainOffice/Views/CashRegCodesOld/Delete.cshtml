@@ -1,0 +1,89 @@
+﻿@model MainOffice.Models.CashRegCode
+@using MainOffice.App_LocalResources
+
+@{
+    ViewBag.Title = GlobalRes.Delete;
+}
+
+<h2>@GlobalRes.Delete</h2>
+
+<div class="modal-header">
+    <h5 class="modal-title">@GlobalRes.DeleteConfirm</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<hr class="border-primary" />
+        <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Code)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Price10)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Price10)
+        </dd>
+		</dl>
+    <hr class="border-primary" />        <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Price50)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Price50)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PriceStaff)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.PriceStaff)
+        </dd>
+		<dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PriceListUnit)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.PriceListUnit.Name)
+        </dd>
+				</dl>
+    <hr class="border-primary" />        <dl class="row">
+		<dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Product)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Product.Name)
+        </dd>
+				<dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Service)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Service.Name)
+        </dd>
+		</dl>
+    <hr class="border-primary" />
+
+     @using (Ajax.BeginForm("Delete", null, new AjaxOptions { OnSuccess = "deleteRow" }, new { id = "DeleteForm" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="modal-footer">
+            <input type="submit" value="@GlobalRes.Delete" class="btn btn-outline-danger float-left" />
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+        </div>
+        
+    }

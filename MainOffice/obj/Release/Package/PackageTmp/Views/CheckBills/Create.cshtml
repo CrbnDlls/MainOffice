@@ -1,0 +1,120 @@
+﻿@model MainOffice.Models.TemporaryBillModel
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+<div class="modal-header">
+    <h5 class="modal-title">@String.Concat(new string[] { "Счет", " - ", GlobalRes.Create })</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+@using (Ajax.BeginForm("Create", null, new AjaxOptions { OnSuccess = "onSuccessCreate", UpdateTargetId = "modalform" }, new { id = "CreateForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <hr class="border border-primary" />
+
+    <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.BillNumber, htmlAttributes: new { @class = "control-label" })
+            <div class="text-center font-weight-bold h3">
+                @Html.DisplayFor(model => model.BillNumber, new { htmlAttributes = new { @class = "control-label" } })
+                @Html.EditorFor(model => model.BillNumber, new { htmlAttributes = new { hidden="true" } })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control", placeholder = "ГГГГММДД" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.StartTime, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.StartTime, new { htmlAttributes = new { @class = "form-control", placeholder = "ЧЧММ" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.StartTime, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Salon, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.Salon, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Salon, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Worker, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.Worker, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Worker, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.BO, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.BO, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.BO, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" />
+    @Html.DataList((List<string>)ViewBag.Services, "serviceList")
+    for (int i = 0; i < Model.BillLines.Count; i++)
+    {
+        string id = "billdivline" + i;
+        <div id="@id" class="form-row">
+            <div class="form-group col-md-2">
+                @Html.Label("Код кассы", htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.BillLines[i].CashRegCode, new { htmlAttributes = new { @class = "form-control" } })
+                <div class="invalid-feedback">
+                    @Html.ValidationMessageFor(model => model.BillLines[i].CashRegCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                @Html.Label("Наименование услуги/товара", htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.BillLines[i].ServiceProductName, new { htmlAttributes = new { @class = "form-control", list = "serviceList" } })
+                <div class="invalid-feedback">
+                    @Html.ValidationMessageFor(model => model.BillLines[i].ServiceProductName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group col-md-2">
+                @Html.Label("Кол-во", htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.BillLines[i].Quantity, new { htmlAttributes = new { @class = "form-control" } })
+                <div class="invalid-feedback">
+                    @Html.ValidationMessageFor(model => model.BillLines[i].Quantity, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group col-md-2">
+                @Html.Label("Цена", htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.BillLines[i].SellPrice, new { htmlAttributes = new { @class = "form-control" } })
+                <div class="invalid-feedback">
+                    @Html.ValidationMessageFor(model => model.BillLines[i].SellPrice, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group col-md-2">
+                @Html.Label("Скидка", htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationDropDownListFor(model => model.BillLines[i].Discount, (IEnumerable<SelectListItem>)ViewBag.Discount, htmlAttributes: new { @class = "form-control" })
+                <div class="invalid-feedback">
+                    @Html.ValidationMessageFor(model => model.BillLines[i].Discount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+        </div>
+        <script type="text/javascript">
+            billLineNumber = @i;
+        </script>
+        
+    }
+    <button id="buttonAddBillLine" onclick="addBillLine()" type="button" class="btn btn-outline-success">+</button>
+    <button onclick="removeBillLine()" type="button" class="btn btn-outline-danger">-</button>
+    <hr class="border border-primary" />
+
+    <div class="modal-footer">
+        <input type="submit" value="@GlobalRes.Save" class="btn btn-outline-success" />
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+    </div>
+}

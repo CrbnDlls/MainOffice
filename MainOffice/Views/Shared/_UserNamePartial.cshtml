@@ -1,0 +1,12 @@
+﻿@using Microsoft.AspNet.Identity
+@if (Request.IsAuthenticated)
+{
+    if (!User.IsInRole("pin"))
+    {
+        @Html.ActionLink("Здравствуйте, " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage", @class = "navbar-brand" })
+    }
+}
+else
+{
+    @Html.ActionLink("Мережа салонів Лонда", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+}

@@ -1,0 +1,75 @@
+﻿@model MainOffice.Models.CashRegCode
+
+@{
+    ViewBag.Title = "Подробности";
+}
+
+<h2>Подробности</h2>
+
+<div>
+    <h4>@ViewData.ModelMetadata.AdditionalValues["ShortName"]</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Price10)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price10)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Price50)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price50)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PriceStaff)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PriceStaff)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.PriceListUnit)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PriceListUnit.Name)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.Product)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Product.Name)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.Service)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Service.Name)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Вернуться к списку", "Index")
+</p>

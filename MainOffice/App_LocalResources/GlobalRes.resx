@@ -1,0 +1,738 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Actions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
+  <data name="AddressGroupName" xml:space="preserve">
+    <value>Адреса</value>
+  </data>
+  <data name="AddressName" xml:space="preserve">
+    <value>Адрес</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="ApplicationUser" xml:space="preserve">
+    <value>Логин</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="BackToList" xml:space="preserve">
+    <value>Вернуться к списку</value>
+  </data>
+  <data name="BarberLevelList" xml:space="preserve">
+    <value>Звания парикмахеров</value>
+  </data>
+  <data name="BarberLevelName" xml:space="preserve">
+    <value>Наименование звания парикмахера</value>
+  </data>
+  <data name="BarberLevelShortName" xml:space="preserve">
+    <value>Звание</value>
+  </data>
+  <data name="BirthDay" xml:space="preserve">
+    <value>Дата рождения</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="CompanyAddress" xml:space="preserve">
+    <value>Юридический адрес</value>
+  </data>
+  <data name="CompanyList" xml:space="preserve">
+    <value>Предприятия</value>
+  </data>
+  <data name="CompanyName" xml:space="preserve">
+    <value>Наименование предприятия</value>
+  </data>
+  <data name="CompanyShortName" xml:space="preserve">
+    <value>Предприятие</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="CurrentCulture" xml:space="preserve">
+    <value>ru-RU</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Вы уверенны, что хотите удалить?</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Подробности</value>
+  </data>
+  <data name="DismissalDate" xml:space="preserve">
+    <value>Дата увольнения</value>
+  </data>
+  <data name="DismissalDateShortName" xml:space="preserve">
+    <value>Уволен</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="EmployeeList" xml:space="preserve">
+    <value>Список сотрудников</value>
+  </data>
+  <data name="EmployeeSalon" xml:space="preserve">
+    <value>Основной салон</value>
+  </data>
+  <data name="EmployeeShortName" xml:space="preserve">
+    <value>Сотрудник</value>
+  </data>
+  <data name="Empty" xml:space="preserve">
+    <value>Пусто</value>
+  </data>
+  <data name="ErrNameLength" xml:space="preserve">
+    <value>Количество символов в {0}, должно быть от {2} до {1}</value>
+  </data>
+  <data name="ErrRequired" xml:space="preserve">
+    <value>Введите {0}</value>
+  </data>
+  <data name="FamilyName" xml:space="preserve">
+    <value>Фамилия</value>
+  </data>
+  <data name="FathersName" xml:space="preserve">
+    <value>Отчество</value>
+  </data>
+  <data name="FilterPrompt" xml:space="preserve">
+    <value>Выберите значения для показа</value>
+  </data>
+  <data name="FilterTitle" xml:space="preserve">
+    <value>Фильтрация данных</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>С</value>
+  </data>
+  <data name="HasValue" xml:space="preserve">
+    <value>Заполнено</value>
+  </data>
+  <data name="HireDate" xml:space="preserve">
+    <value>Дата принятия на работу</value>
+  </data>
+  <data name="HireDateShortName" xml:space="preserve">
+    <value>Принят</value>
+  </data>
+  <data name="HtmlHelper_MissingSelectData" xml:space="preserve">
+    <value>Отсутсвуют данные для списка выбора</value>
+  </data>
+  <data name="HtmlHelper_SelectExpressionNotEnumerable" xml:space="preserve">
+    <value>Выражение для списка выбора не является перечислением</value>
+  </data>
+  <data name="HtmlHelper_WrongSelectDataType" xml:space="preserve">
+    <value>Не верный тип данных для списка выбора</value>
+  </data>
+  <data name="Index" xml:space="preserve">
+    <value>Порядковый номер</value>
+  </data>
+  <data name="IndexShort" xml:space="preserve">
+    <value>№ п/п</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="NullOrEmpty" xml:space="preserve">
+    <value>Значение не может быть пустым или null</value>
+  </data>
+  <data name="OldFamilyName" xml:space="preserve">
+    <value>Девичья фамилия</value>
+  </data>
+  <data name="OldFamilyShortName" xml:space="preserve">
+    <value>Дев. фамил.</value>
+  </data>
+  <data name="PhoneNumber1Name" xml:space="preserve">
+    <value>Мобильный телефон</value>
+  </data>
+  <data name="PhoneNumber1ShortName" xml:space="preserve">
+    <value>Телефон №1</value>
+  </data>
+  <data name="PhoneNumber2Name" xml:space="preserve">
+    <value>Дополнительный телефон</value>
+  </data>
+  <data name="PhoneNumber2ShortName" xml:space="preserve">
+    <value>Телефон №2</value>
+  </data>
+  <data name="PhoneNumberGroupName" xml:space="preserve">
+    <value>Номера телефонов</value>
+  </data>
+  <data name="ProductlineList" xml:space="preserve">
+    <value>Линии продуктов</value>
+  </data>
+  <data name="ProductlineName" xml:space="preserve">
+    <value>Наименование линии продуктов</value>
+  </data>
+  <data name="ProductlineShortName" xml:space="preserve">
+    <value>Линия</value>
+  </data>
+  <data name="ProductList" xml:space="preserve">
+    <value>Список продукции</value>
+  </data>
+  <data name="ProductName" xml:space="preserve">
+    <value>Наименование продукта</value>
+  </data>
+  <data name="ProductShortName" xml:space="preserve">
+    <value>Продукция</value>
+  </data>
+  <data name="ProductVolumeList" xml:space="preserve">
+    <value>Объемы продукта</value>
+  </data>
+  <data name="ProductVolumeName" xml:space="preserve">
+    <value>Наименование объема продукта</value>
+  </data>
+  <data name="ProductVolumeShortName" xml:space="preserve">
+    <value>Объем</value>
+  </data>
+  <data name="ProfessionList" xml:space="preserve">
+    <value>Профессии</value>
+  </data>
+  <data name="ProfessionName" xml:space="preserve">
+    <value>Название профессии</value>
+  </data>
+  <data name="ProfessionShortName" xml:space="preserve">
+    <value>Профессия</value>
+  </data>
+  <data name="PromptEnter" xml:space="preserve">
+    <value>Введите {0}</value>
+  </data>
+  <data name="RegisterCompany" xml:space="preserve">
+    <value>Оформлен на предприятии</value>
+  </data>
+  <data name="RegisterCompanyShortName" xml:space="preserve">
+    <value>Оформлен</value>
+  </data>
+  <data name="RegisterDate" xml:space="preserve">
+    <value>Дата оформления</value>
+  </data>
+  <data name="RegisterDateShortName" xml:space="preserve">
+    <value>Дата офор.</value>
+  </data>
+  <data name="SalonGroupName" xml:space="preserve">
+    <value>Названия салонов</value>
+  </data>
+  <data name="SalonList" xml:space="preserve">
+    <value>Список салонов</value>
+  </data>
+  <data name="SalonName" xml:space="preserve">
+    <value>Название салона</value>
+  </data>
+  <data name="SalonShortName" xml:space="preserve">
+    <value>Салон</value>
+  </data>
+  <data name="SalonStateList" xml:space="preserve">
+    <value>Статусы салона</value>
+  </data>
+  <data name="SalonStateName" xml:space="preserve">
+    <value>Наименование статуса</value>
+  </data>
+  <data name="SalonStateShortName" xml:space="preserve">
+    <value>Статус</value>
+  </data>
+  <data name="SalonTypeList" xml:space="preserve">
+    <value>Типы салона</value>
+  </data>
+  <data name="SalonTypeName" xml:space="preserve">
+    <value>Наименование типа</value>
+  </data>
+  <data name="SalonTypeShortName" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="ServiceList" xml:space="preserve">
+    <value>Список услуг</value>
+  </data>
+  <data name="ServiceName" xml:space="preserve">
+    <value>Наименование услуги</value>
+  </data>
+  <data name="ServiceShortName" xml:space="preserve">
+    <value>Услуги</value>
+  </data>
+  <data name="ServiceVolumeList" xml:space="preserve">
+    <value>Объемы услуги</value>
+  </data>
+  <data name="ServiceVolumeName" xml:space="preserve">
+    <value>Наименование объема услуги</value>
+  </data>
+  <data name="ServiceVolumeShortName" xml:space="preserve">
+    <value>Объем</value>
+  </data>
+  <data name="ShouldBeDate" xml:space="preserve">
+    <value>Поле должно содержать дату.</value>
+  </data>
+  <data name="StaffNumber" xml:space="preserve">
+    <value>Номер для печати счета</value>
+  </data>
+  <data name="StaffNumberShortName" xml:space="preserve">
+    <value>ID сотр.</value>
+  </data>
+  <data name="TableFilters" xml:space="preserve">
+    <value>Фильтра</value>
+  </data>
+  <data name="TelFormat" xml:space="preserve">
+    <value>Телефонный номер должен быть формата (0XX) XXX-XX-XX</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>По</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Всего</value>
+  </data>
+  <data name="TrademarkList" xml:space="preserve">
+    <value>Торговые марки</value>
+  </data>
+  <data name="TrademarkName" xml:space="preserve">
+    <value>Наименование торговой марки</value>
+  </data>
+  <data name="TrademarkShortName" xml:space="preserve">
+    <value>ТМ</value>
+  </data>
+  <data name="UserLanguage" xml:space="preserve">
+    <value>Язык: Русский</value>
+  </data>
+  <data name="PriceListUnitList" xml:space="preserve">
+    <value>Разделы прейскуранта</value>
+  </data>
+  <data name="PriceListUnitName" xml:space="preserve">
+    <value>Наименование раздела прейскуранта</value>
+  </data>
+  <data name="PriceListUnitShortName" xml:space="preserve">
+    <value>Раздел прейскуранта</value>
+  </data>
+  <data name="CashRegCodeFormat" xml:space="preserve">
+    <value>Код должен состоять из цифр, от 1 до 999999</value>
+  </data>
+  <data name="CashRegCodeList" xml:space="preserve">
+    <value>Кода кассы</value>
+  </data>
+  <data name="CashRegCodeName" xml:space="preserve">
+    <value>Код кассы</value>
+  </data>
+  <data name="CashRegCodePrice10Name" xml:space="preserve">
+    <value>Цена со скидкой 1</value>
+  </data>
+  <data name="CashRegCodePrice10ShortName" xml:space="preserve">
+    <value>Цена %1</value>
+  </data>
+  <data name="CashRegCodePrice50Name" xml:space="preserve">
+    <value>Цена со скидкой 2</value>
+  </data>
+  <data name="CashRegCodePrice50ShortName" xml:space="preserve">
+    <value>Цена %2</value>
+  </data>
+  <data name="CashRegCodePriceName" xml:space="preserve">
+    <value>Полная цена</value>
+  </data>
+  <data name="CashRegCodePriceShortName" xml:space="preserve">
+    <value>Цена</value>
+  </data>
+  <data name="CashRegCodePriceStaffName" xml:space="preserve">
+    <value>Цена сотрудника</value>
+  </data>
+  <data name="CashRegCodePriceStaffShortName" xml:space="preserve">
+    <value>Цена сотр.</value>
+  </data>
+  <data name="CashRegCodeShortName" xml:space="preserve">
+    <value>Кода</value>
+  </data>
+  <data name="Rows" xml:space="preserve">
+    <value>строк</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Выбрать все</value>
+  </data>
+  <data name="UpdateDate" xml:space="preserve">
+    <value>Дата обновления</value>
+  </data>
+  <data name="UpdateDateShortName" xml:space="preserve">
+    <value>Обновление</value>
+  </data>
+  <data name="UpdateToDate" xml:space="preserve">
+    <value>Обновить к дате</value>
+  </data>
+  <data name="PromptDate" xml:space="preserve">
+    <value>Введите дату</value>
+  </data>
+  <data name="WrongDateFormat" xml:space="preserve">
+    <value>Не верный формат даты</value>
+  </data>
+  <data name="Duplicate" xml:space="preserve">
+    <value>Дубликат</value>
+  </data>
+  <data name="DuplicateDataError" xml:space="preserve">
+    <value>Введенные данные дублируют присутствующие в базе</value>
+  </data>
+  <data name="ErrDelayedUpdateExists" xml:space="preserve">
+    <value>Невозможно выполнить действие. Данные связаны отложенными обновлениями</value>
+  </data>
+  <data name="DelayedUpdate" xml:space="preserve">
+    <value>Отложенное обновление</value>
+  </data>
+  <data name="ErrParentTableData" xml:space="preserve">
+    <value>Невозможно выполнить действие. Введенные данные дублируют существующие активные данные </value>
+  </data>
+  <data name="ErrPriceRange" xml:space="preserve">
+    <value>Значение цены должно быть от {1} до {2} грн.</value>
+  </data>
+  <data name="CannotChooseBoth" xml:space="preserve">
+    <value>Необходимо выбрать что-то одно</value>
+  </data>
+  <data name="MustChoose" xml:space="preserve">
+    <value>Вы должны выбрать продукцию или услугу</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="AdditionalPhone" xml:space="preserve">
+    <value>Дополнительный телефон</value>
+  </data>
+  <data name="ClientList" xml:space="preserve">
+    <value>Список клиентов</value>
+  </data>
+  <data name="ClientShortName" xml:space="preserve">
+    <value>Клиент</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Электронная почта</value>
+  </data>
+  <data name="MainPhone" xml:space="preserve">
+    <value>Основной телефон</value>
+  </data>
+  <data name="BillEndTime" xml:space="preserve">
+    <value>Время завершения работы</value>
+  </data>
+  <data name="BillIssueDate" xml:space="preserve">
+    <value>Дата выдачи</value>
+  </data>
+  <data name="BillList" xml:space="preserve">
+    <value>Список счетов</value>
+  </data>
+  <data name="BillNumber" xml:space="preserve">
+    <value>Номер счета</value>
+  </data>
+  <data name="BillShortName" xml:space="preserve">
+    <value>Счет</value>
+  </data>
+  <data name="BillStartTime" xml:space="preserve">
+    <value>Время начала работы</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="CancelDateTime" xml:space="preserve">
+    <value>Время отмены</value>
+  </data>
+  <data name="FullPrice" xml:space="preserve">
+    <value>Полная цена</value>
+  </data>
+  <data name="InsertDateTime" xml:space="preserve">
+    <value>Время внесения</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="ProductServiceName" xml:space="preserve">
+    <value>Услуга / Продукция</value>
+  </data>
+  <data name="Promotion" xml:space="preserve">
+    <value>Акция</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="SellPrice" xml:space="preserve">
+    <value>Цена продажи</value>
+  </data>
+  <data name="Visa" xml:space="preserve">
+    <value>Завизировал</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Конец</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Начало</value>
+  </data>
+  <data name="Summ" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
+  <data name="Latitude" xml:space="preserve">
+    <value>Широта</value>
+  </data>
+  <data name="Longitude" xml:space="preserve">
+    <value>Долгота</value>
+  </data>
+  <data name="IPAdress" xml:space="preserve">
+    <value>IP адрес</value>
+  </data>
+  <data name="WrongIpFormat" xml:space="preserve">
+    <value>Неверный формат IP адреса</value>
+  </data>
+  <data name="Closed" xml:space="preserve">
+    <value>Закрыто</value>
+  </data>
+  <data name="ErrOperDaySalon" xml:space="preserve">
+    <value>Действия с операционным днем не доступны.</value>
+  </data>
+  <data name="FarAwayFromSalon" xml:space="preserve">
+    <value>Вы находитесь далеко от салона.</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Открыть</value>
+  </data>
+  <data name="Opened" xml:space="preserve">
+    <value>Открыто</value>
+  </data>
+  <data name="OperationDate" xml:space="preserve">
+    <value>Дата работы салона</value>
+  </data>
+  <data name="RegisterSelf" xml:space="preserve">
+    <value>Зарегестрироваться</value>
+  </data>
+  <data name="CloseWorkSheet" xml:space="preserve">
+    <value>Закрыть рабочий лист</value>
+  </data>
+  <data name="EndTime" xml:space="preserve">
+    <value>Конец работы</value>
+  </data>
+  <data name="ErrGeoLocation" xml:space="preserve">
+    <value>Ошибка с получением данных о вашем местоположении.</value>
+  </data>
+  <data name="ErrGeoLocationAccess" xml:space="preserve">
+    <value>Вы запретили доступ к вашему местоположению.</value>
+  </data>
+  <data name="StartTime" xml:space="preserve">
+    <value>Начало работы</value>
+  </data>
+  <data name="WorkSheets" xml:space="preserve">
+    <value>Рабочие листы</value>
+  </data>
+  <data name="Registered" xml:space="preserve">
+    <value>Зарегестрирован(-а)</value>
+  </data>
+  <data name="WorkSheet" xml:space="preserve">
+    <value>Рабочий лист</value>
+  </data>
+  <data name="OpenWorkSheet" xml:space="preserve">
+    <value>Открыть лист</value>
+  </data>
+  <data name="StartService" xml:space="preserve">
+    <value>Старт</value>
+  </data>
+  <data name="QuantityShort" xml:space="preserve">
+    <value>Кол-во</value>
+  </data>
+  <data name="OrderNumber" xml:space="preserve">
+    <value>Номер для сортировки</value>
+  </data>
+  <data name="Color" xml:space="preserve">
+    <value>Цвет</value>
+  </data>
+  <data name="EditLock" xml:space="preserve">
+    <value>Редактирует</value>
+  </data>
+  <data name="SalonPrinterList" xml:space="preserve">
+    <value>Список принтеров</value>
+  </data>
+  <data name="SalonPrinterName" xml:space="preserve">
+    <value>Наименование принтера</value>
+  </data>
+  <data name="SalonPrinterShortName" xml:space="preserve">
+    <value>Принтер</value>
+  </data>
+  <data name="PrintCountName" xml:space="preserve">
+    <value>Кол-во напечатано</value>
+  </data>
+  <data name="SalonPrinterSysName" xml:space="preserve">
+    <value>Имя принтера в ОС</value>
+  </data>
+  <data name="CloseEmployee" xml:space="preserve">
+    <value>Закрыл</value>
+  </data>
+  <data name="CloseGeoLocation" xml:space="preserve">
+    <value>Место закрытия</value>
+  </data>
+  <data name="CloseOperationPoint" xml:space="preserve">
+    <value>Время закрытия</value>
+  </data>
+  <data name="OpenEmployee" xml:space="preserve">
+    <value>Открыл</value>
+  </data>
+  <data name="OpenGeoLocation" xml:space="preserve">
+    <value>Место открытия</value>
+  </data>
+  <data name="OpenOperationPoint" xml:space="preserve">
+    <value>Время открытия</value>
+  </data>
+  <data name="OperationDayArchiveShortName" xml:space="preserve">
+    <value>Операционный день</value>
+  </data>
+  <data name="OperationDayArchiveShortNameList" xml:space="preserve">
+    <value>Список операционных дней</value>
+  </data>
+  <data name="StaffQuantity" xml:space="preserve">
+    <value>Кол-во сотр. присутствует</value>
+  </data>
+  <data name="StaffQuantityBuisy" xml:space="preserve">
+    <value>Сейчас с клиентом</value>
+  </data>
+  <data name="SummClosed" xml:space="preserve">
+    <value>Сумма закрытых</value>
+  </data>
+  <data name="SummInWork" xml:space="preserve">
+    <value>Сумма в работе</value>
+  </data>
+  <data name="BoQuantity" xml:space="preserve">
+    <value>Кол-во БО</value>
+  </data>
+  <data name="BoSumm" xml:space="preserve">
+    <value>Сумма БО</value>
+  </data>
+  <data name="InitialPromo" xml:space="preserve">
+    <value>Начальная скидка</value>
+  </data>
+  <data name="VisaPromo" xml:space="preserve">
+    <value>Виза скидки</value>
+  </data>
+  <data name="VisaShort" xml:space="preserve">
+    <value>Виза</value>
+  </data>
+  <data name="PStatus" xml:space="preserve">
+    <value>Оплата</value>
+  </data>
+  <data name="Deposit" xml:space="preserve">
+    <value>Депозит</value>
+  </data>
+  <data name="Kasa" xml:space="preserve">
+    <value>Касса</value>
+  </data>
+  <data name="Terminal" xml:space="preserve">
+    <value>Терминал</value>
+  </data>
+  <data name="Unpaid" xml:space="preserve">
+    <value>Неоплачены</value>
+  </data>
+</root>

@@ -1,0 +1,126 @@
+﻿@model MainOffice.Models.BillFilter
+@using MainOffice.App_LocalResources;
+@using MainOffice.Helpers
+@{
+    var metaData = ModelMetadataProviders
+    .Current
+    .GetMetadataForType(null, typeof(MainOffice.Models.Bill));
+    Dictionary<string, ModelMetadata> properties = metaData.Properties.ToDictionary(p => p.PropertyName);
+}    
+
+<div class="sidebar-header text-center">
+    <h6>@GlobalRes.FilterTitle</h6>
+</div>
+
+@using (Ajax.BeginForm("Filter", null, new AjaxOptions { OnSuccess = "onSuccessFilter" },new { @class = "needs-validation" }))
+{
+
+    <div class="sidebar-body">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					<div class="form-group">
+						@Html.Label(properties["Salon"].DisplayName, new { @for = "SalonId" })
+						@Html.ListBoxFor(model => model.SalonIdSelected, (MultiSelectList)ViewBag.SalonsSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								<div class="form-group">
+						@Html.Label(properties["Employee"].DisplayName, new { @for = "EmployeeId" })
+						@Html.ListBoxFor(model => model.EmployeeIdSelected, (MultiSelectList)ViewBag.EmployeesSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+									@Html.Label(properties["IssueDate"].DisplayName, new { @for = "IssueDate" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.IssueDateFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.IssueDateFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.IssueDateFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.IssueDateTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.IssueDateTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.IssueDateTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+						@Html.Label(properties["StartTime"].DisplayName, new { @for = "StartTime" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.StartTimeFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.StartTimeFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.StartTimeFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.StartTimeTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.StartTimeTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.StartTimeTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+						@Html.Label(properties["EndTime"].DisplayName, new { @for = "EndTime" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.EndTimeFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.EndTimeFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.EndTimeFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.EndTimeTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.EndTimeTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.EndTimeTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+						@Html.Label(properties["PrintCount"].DisplayName, new { @for = "PrintCount" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.PrintCountFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.PrintCountFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.PrintCountFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.PrintCountTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.PrintCountTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.PrintCountTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+</div>
+    <div class="sidebar-footer">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+    </div>
+}

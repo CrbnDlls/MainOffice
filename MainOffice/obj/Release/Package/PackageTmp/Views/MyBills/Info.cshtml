@@ -1,0 +1,52 @@
+﻿@model MainOffice.Models.OperDayBill
+@{ decimal Summ = 0;
+    for (int i = 0; i < Model.BillLines.Count; i++)
+    {
+        if(!Model.BillLines[i].Cancel)
+        {
+            Summ = Summ + (Model.BillLines[i].SellPrice * Model.BillLines[i].Quantity);
+        }
+    }
+}
+<div id="windowmodal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <table class="table table-sm table-responsive">
+                        <thead>
+                            <tr>
+                                <th scope="col" colspan="4">№ @Html.DisplayFor(model => model.BillNumber)</th>
+                                <th scope="col" colspan="1">@GlobalRes.Summ:</th>
+                                <th scope="col" colspan="2">@Summ</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">№</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.BillLines[0].CashRegCode)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.BillLines[0].ProductOrServiceName)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.BillLines[0].Promotion)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.BillLines[0].SellPrice)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.BillLines[0].Quantity)</th>
+                                <th scope="col">@GlobalRes.Summ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.BillLines.Count; i++)
+                            {
+                                <tr @(Model.BillLines[i].Cancel ? "class=bg-danger": "")>
+                                    <th scope="row">@(i + 1)</th>
+                                    <td>@Html.DisplayFor(model => model.BillLines[i].CashRegCode)</td>
+                                    <td>@Html.DisplayFor(model => model.BillLines[i].ProductOrServiceName)</td>
+                                    <td>@Html.DisplayFor(model => model.BillLines[i].Promotion)</td>
+                                    <td>@Html.DisplayFor(model => model.BillLines[i].SellPrice)</td>
+                                    <td>@Html.DisplayFor(model => model.BillLines[i].Quantity)</td>
+                                    <td>@(Model.BillLines[i].SellPrice * Model.BillLines[i].Quantity)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

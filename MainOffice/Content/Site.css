@@ -1,0 +1,141 @@
+﻿/*body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}*/
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+.navbar.moveright {
+    width: calc(100% + 250px);
+    /*padding-left: 266px;
+        transition: 0.25s padding-left ease-in-out;*/
+}
+/*.navbar {
+        transition: 0.25s padding-left ease-in-out;
+    }*/
+#sidebar.active {
+    margin-left: 0;
+}
+
+.btn-group.special {
+    display: flex;
+}
+
+.special .btn {
+    flex: 1
+}
+
+a[data-toggle="collapse"] {
+    position: relative;
+}
+
+#sidebar .dropdown-toggle::after {
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+#sidebar {
+    margin-left: -250px;
+    min-width: 250px;
+    max-width: 250px;
+    /*min-height: 100vh;*/
+    background: #23b5cc;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+    #sidebar .sidebar-header {
+        padding: 20px;
+        background: #17a2b8;
+    }
+
+    #sidebar .components {
+        padding: 20px 0;
+        border-bottom: 1px solid #47748b;
+    }
+
+    #sidebar ul p {
+        color: #fff;
+        padding: 10px;
+    }
+
+    #sidebar .dropdown-menu {
+        max-width: 230px !important;
+        min-width: 200px !important;
+    }
+
+    #sidebar form {
+        padding: 10px;
+    }
+    /*#sidebar ul li a {
+            padding: 10px;
+            font-size: 1.1em;
+            display: block;
+        }*/
+
+    #sidebar ul li a:hover {
+        color: #7386D5;
+        background: #fff;
+    }
+
+    #sidebar ul li.active > a, a[aria-expanded="true"] {
+        color: #fff;
+        background: #6d7fcc;
+    }
+
+.select,
+#locale {
+    width: 100%;
+}
+
+.edit {
+    margin-right: 10px;
+}
+
+.menu {
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+.menu-title
+{
+    text-align:center;
+    font-size:larger;
+    font-weight:bold;
+}
+.popover {
+    max-width: 800px;
+}
+@media print {
+    .page-break {
+        display: block;
+        page-break-before: always;
+    }
+}

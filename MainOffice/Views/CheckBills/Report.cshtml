@@ -1,0 +1,55 @@
+﻿@model MainOffice.Models.TemporaryBillReportView
+
+@{
+    ViewBag.Title = Model.start + " / " + Model.end + " Отчет";
+}
+
+@foreach (MainOffice.Models.TemporaryBillReportSalon salon in Model.reportsSalon)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr class="table-info">
+                <th title="@Model.start - @Model.end @salon.Salon" colspan="8">@Model.start - @Model.end @salon.Salon</th>
+            </tr>
+            <tr>
+                <th title="Номер">Номер сотрудника</th>
+                <th title="Фамилия Имя">Фамилия Имя</th>
+                <th title="Сумма без скидок">Сумма без скидок</th>
+                <th title="Сумма 10%">Сумма 10%</th>
+                <th title="Сумма сотруд.">Сумма сотруд.</th>
+                <th title="Сумма БО">Сумма БО</th>
+                <th title="Кол-во счетов">Кол-во счетов</th>
+                <th title="Кол-во ошибочных">Кол-во ошибочных</th>
+            </tr>
+        </thead>
+        @foreach (MainOffice.Models.TemporaryBillReport report in salon.reports)
+        {
+            <tr>
+                <td>@report.id</td>
+                <td>@report.Worker</td>
+                <td>@report.Summ</td>
+                <td>@report.SummDisc10</td>
+                <td>@report.SummDiscStaff</td>
+                <td>@report.SummBO</td>
+                <td>@report.BillQuantity</td>
+                <td>@report.BillErrorQuantity</td>
+            </tr>
+        }
+        <tfoot>
+            <tr class="table-info" style="font-weight:bold">
+                <td rowspan="2">Всего</td>
+                <td rowspan="2">@salon.reports.Count()</td>
+                <td>@salon.Summ</td>
+                <td>@salon.SummDisc10</td>
+                <td rowspan="2">@salon.SummDiscStaff</td>
+                <td rowspan="2">@salon.SummBO</td>
+                <td rowspan="2">@salon.BillQuantity</td>
+                <td rowspan="2">@salon.BillErrorQuantity</td>
+            </tr>
+            <tr class="table-info" style="font-weight:bold">
+                <td colspan="2">@(salon.Summ + salon.SummDisc10)</td>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="page-break"></div>
+}

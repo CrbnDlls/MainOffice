@@ -1,0 +1,44 @@
+﻿@model MainOffice.Models.OperDayStatisticsViewModel
+
+@{
+    ViewBag.Title = "GetDaySumm";
+}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOper" aria-controls="navbarOper" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarOper">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                @Html.ActionLink("Операционный день", "Index", null, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                @Html.ActionLink("Статус", "Status", null, new { @class = "nav-link" })
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item active">
+                @Html.ActionLink("Суммы за день", "GetDaySumm", null, new { @class = "nav-link" })
+            </li>
+        </ul>
+    </div>
+</nav>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">@Html.DisplayNameFor(model => model.KasaSumm)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.TerminalSumm)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.UnpaidSumm)</th>
+            <th scope="col">@GlobalRes.Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.KasaSumm)</td>
+            <td>@Html.DisplayFor(model => model.TerminalSumm)</td>
+            <td>@Html.DisplayFor(model => model.UnpaidSumm)</td>
+            <td>@Html.DisplayFor(model => model.SummClosed)</td>
+        </tr>
+    </tbody>
+</table>
+

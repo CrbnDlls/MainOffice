@@ -1,0 +1,233 @@
+﻿@model MainOffice.Models.OperationDay
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+@{
+    ViewBag.Title = "Index";
+}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOper" aria-controls="navbarOper" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarOper">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                @Html.ActionLink("Операционный день", "Index", null, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                @Html.ActionLink("Статус", "Status",null,new { @class="nav-link"})
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        @if (Model != null)
+        {
+            if (Model.Salon != null)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">@Html.DisplayNameFor(model => model.Salon)</th>
+                            <th scope="col">@Html.DisplayNameFor(model => model.OperationDate)</th>
+                            <th scope="col">@GlobalRes.SalonStateShortName</th>
+                            <th scope="col">@GlobalRes.Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@Html.DisplayFor(model => model.Salon.Name)<br />@Html.DisplayFor(model => model.Salon.Address)</td>
+                            <td>@Html.DisplayFor(model => model.OperationDate)</td>
+                            <td>
+                                @if (Model.OpenOperationPoint != null & Model.CloseOperationPoint == null)
+                                {
+                                    <div class="alert alert-success" role="alert">
+                                        @GlobalRes.Opened
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-danger" role="alert">
+                                        @GlobalRes.Closed
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                @if (Model.OpenOperationPoint == null & Model.CloseOperationPoint == null)
+                                {
+                                    @*@Html.ActionLink(GlobalRes.Open, "ChangeOperDayStatus", null, new { @class = "btn btn-outline-success" })*@
+                                    <button onclick="changeOperDayStatus(this)" id="buttonOpen" class="btn btn-outline-success"><i class="fas fa-spinner fa-pulse" style="display:none" id="statusSpinner"></i>@GlobalRes.Open</button>
+                                }
+                                else if (Model.OpenOperationPoint != null & Model.CloseOperationPoint == null)
+                                {
+                                    if (Model.OperationDayEmployees == null)
+                                    {
+                                        @*@Html.ActionLink(GlobalRes.RegisterSelf, "ChangeOperDayStatus", null, new { @class = "btn btn-outline-success" })*@
+                                        <button onclick="changeOperDayStatus(this)" id="buttonRegister" class="btn btn-outline-success"><i class="fas fa-spinner fa-pulse" style="display:none" id="statusSpinner"></i>@GlobalRes.RegisterSelf</button>
+                                    }
+                                    else
+                                    {
+                                        @*@Html.ActionLink(GlobalRes.Close, "ChangeOperDayStatus", null, new { @class = "btn btn-outline-danger" })*@
+                                        <button onclick="changeOperDayStatus(this)" id="buttonClose" class="btn btn-outline-danger"><i class="fas fa-spinner fa-pulse" style="display:none" id="statusSpinner"></i>@GlobalRes.Close салон</button>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                if (Model.OperationDayEmployees != null)
+                {
+                    <hr />
+                    <table class="table" id="tableWorkers">
+                        <thead>
+                            <tr>
+                                <th scope="col" colspan="8">@GlobalRes.WorkSheets</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">№</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.OperationDayEmployees[0].Employee.Profession)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.OperationDayEmployees[0].Employee.BarberLevel)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.OperationDayEmployees[0].Employee)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.OperationDayEmployees[0].Employee.StaffNumber)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.OperationDayEmployees[0].StartPoint)</th>
+                                <th scope="col">@Html.DisplayNameFor(model => model.OperationDayEmployees[0].EndPoint)</th>
+                                <th scope="col">@Html.ActionLink(GlobalRes.Create, "FindEmployee", null,new { @class="btn btn-outline-success" })@*<button class="btn btn-outline-success">@GlobalRes.Create</button>*@</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.OperationDayEmployees.Count; i++)
+                            {
+                            <tr>
+                                <th>@(i + 1)</th>
+                                <td>@Html.DisplayFor(model => model.OperationDayEmployees[i].Employee.Profession.Name)</td>
+                                <td>@Html.DisplayFor(model => model.OperationDayEmployees[i].Employee.BarberLevel.Name)</td>
+                                <td>@Html.DisplayFor(model => model.OperationDayEmployees[i].Employee.FamilyName) @Html.DisplayFor(model => model.OperationDayEmployees[i].Employee.Name)</td>
+                                <td>@(Model.OperationDayEmployees[i].pin.HasValue ? Html.Raw("<a tabindex=\"0\" class=\"btn btn-outline-secondary\" role=\"button\" data-toggle=\"popover\" data-trigger=\"focus\" title=\"PIN\" data-content=\"" + Model.OperationDayEmployees[i].pin.Value + "\">PIN</a>") : Html.ActionLink("Новый PIN", "GeneratePin", new { Id = Model.OperationDayEmployees[i].Id }, new { @class = "btn btn-outline-secondary", onclick = "return confirm('Сгенерировать PIN ?')" })) @Html.DisplayFor(model => model.OperationDayEmployees[i].Employee.StaffNumber)</td>
+                                <td>@Html.DisplayFor(model => model.OperationDayEmployees[i].StartPoint)</td>
+                                <td id="@("tdEnd" + Model.OperationDayEmployees[i].Id)">@Html.DisplayFor(model => model.OperationDayEmployees[i].EndPoint)</td>
+                                <td>
+                                    @using (Ajax.BeginForm("CloseWorkSheet", "OperationDays", null, new AjaxOptions() {Confirm = GlobalRes.Close + " " + GlobalRes.WorkSheet + " №" + Model.OperationDayEmployees[i].Employee.StaffNumber + " " + Model.OperationDayEmployees[i].Employee.FamilyName + " " + Model.OperationDayEmployees[i].Employee.Name + " ?", HttpMethod = "Post", OnSuccess = "onSuccessCloseWrksh", LoadingElementId = "closeSpinner" + Model.OperationDayEmployees[i].Id, OnFailure = "onFail" }, new { id="formClose" + (i+2)}))
+                                    {
+                                        @Html.Hidden("EmployeeId", Model.OperationDayEmployees[i].Id)
+                                    <button id="@("submitCloseWrksh" + Model.OperationDayEmployees[i].Id)" type="submit" @(Model.OperationDayEmployees[i].EndPoint == null ? Html.Raw("class=\"btn btn-outline-danger\"") : Html.Raw("class=\"btn btn-dark\" disabled"))><i class="fas fa-spinner fa-pulse" style="display:none" id="@("closeSpinner" +Model.OperationDayEmployees[i].Id)"></i>@(Model.OperationDayEmployees[i].EndPoint == null ? GlobalRes.CloseWorkSheet : "Лист закрыт")</button>
+                                        @*<button onclick="closeWorkSheet(this)" id="buttonCloseWrksh@(i+2)" @(Model.OperationDayEmployees[i].EndPoint == null ? Html.Raw("class=\"btn btn-outline-danger\"") : Html.Raw("class=\"btn btn-danger\" disabled"))>@GlobalRes.CloseWorkSheet</button>*@
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    @GlobalRes.ErrOperDaySalon - @ViewBag.GeoError
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                User is not assigned to employee.
+            </div>
+        }
+    </div>
+</div>
+<div id="bottom">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+</div>
+@section scripts
+{
+    <script type="text/javascript">
+        
+        function onSuccessCloseWrksh(data) {
+            if (data.result == 'success') {
+                document.getElementById('tdEnd' + data.id).innerHTML = data.data;
+                var btn = document.getElementById('submitCloseWrksh' + data.id);
+                btn.disabled = true;
+                btn.setAttribute('class', 'btn btn-dark');
+                btn.innerText = 'Лист закрыт';
+            }
+            else {
+                alert(data.message);
+            }
+        } 
+        function changeOperDayStatus(btn)
+        {
+            switch (btn.id)
+            {
+                case "buttonOpen":
+                    if (confirm("@GlobalRes.Open @GlobalRes.SalonShortName ?"))
+                    { changeStatus('open'); }
+                    break;
+                case "buttonRegister":
+                    if (confirm("@GlobalRes.RegisterSelf ?"))
+                    { changeStatus('register'); }
+                    break;
+                case "buttonClose":
+                    if (confirm("@GlobalRes.Close @GlobalRes.SalonShortName ?"))
+                    { changeStatus('close'); }
+                    break;
+            }
+        }
+        function changeStatus(action) {
+            var options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+                        
+            function success(pos) {
+                var crd = pos.coords;
+                sendData(action,null, crd.latitude, crd.longitude)
+            };
+            
+            function error(err) {
+                
+                sendData(err.code == 1 ? '@GlobalRes.ErrGeoLocationAccess' : '@GlobalRes.ErrGeoLocation',null,null);
+            };
+
+            navigator.geolocation.getCurrentPosition(success, error, options);
+
+            
+        }
+        function sendData(action,errormessage, latitude, longitude)
+        {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("ChangeOperDayStatus", "OperationDays")",
+                data: {
+                    action: action,
+                    message: errormessage,
+                    latitude: latitude,
+                    longitude: longitude
+                },
+                beforeSend: function () {
+                    document.getElementById('statusSpinner').style.display = 'block'
+                },
+                success: function (data) {
+                    if (data.result === 'success') {
+                        document.location.reload(true);
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                },
+                error: onFail,
+                complete: function () { document.getElementById('statusSpinner').style.display = 'none' }
+            })
+        }
+        function onFail(xhr)
+        {
+            alert('Действие не выполнено. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status)
+        }
+        $(function () {
+            $('[data-toggle="popover"]').popover()
+        })
+    </script>
+}

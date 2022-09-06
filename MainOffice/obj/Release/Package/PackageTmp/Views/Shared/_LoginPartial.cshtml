@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNet.Identity
+@using MainOffice.Helpers
+@if (Request.IsAuthenticated)
+{
+    if (!User.IsInRole("pin"))
+    {
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            @Html.ActionLink("Домашняя страница", "Index", "Home", new { }, new { @class = "nav-link" })
+        </li>
+    </ul>
+    
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "form-inline my-2 my-lg-0" }))
+    {
+    @Html.AntiForgeryToken()
+
+    <ul class="nav navbar-nav navbar-right">
+        <li><a class = "nav-link" href="javascript:document.getElementById('logoutForm').submit()">Выйти</a></li>
+    </ul>
+        }
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("Выполнить вход", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink", @class = "nav-link" })</li>
+    </ul>
+}

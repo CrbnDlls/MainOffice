@@ -1,0 +1,11 @@
+﻿@model MainOffice.Models.PriceListSelectViewModel
+@{
+    ViewBag.Title = "Price";
+}
+
+<h2>Price</h2>
+<div class="container">
+    <div id="pricelist" class="row">
+        @Html.Partial("PriceListUnits", Model)
+    </div>
+</div>

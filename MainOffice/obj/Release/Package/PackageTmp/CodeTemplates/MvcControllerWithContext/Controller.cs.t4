@@ -1,0 +1,960 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Linq" #>
+<#@ assembly name="F:\Video (F)\Visual studio\Visual Projects\MainOffice\MainOffice\bin\MainOffice.dll" #>
+<#@ ScaffoldingAssembly Processor="ScaffoldingAssemblyLoader" #>
+<#
+string routePrefix;
+if (String.IsNullOrEmpty(AreaName)) 
+{
+    routePrefix = ControllerRootName;
+}
+else
+{
+    routePrefix = AreaName + "/" + ControllerRootName;
+}
+#>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="Microsoft.AspNet.Scaffolding.Core.Metadata" #>
+<#@ import namespace="System.Diagnostics" #>
+<#@ import namespace="MainOffice.Annotations" #>
+<#@ import namespace="System.Reflection" #>
+<#@ parameter type="System.String" name="ControllerName" #>
+<#@ parameter type="System.String" name="ControllerRootName" #>
+<#@ parameter type="System.String" name="Namespace" #>
+<#@ parameter type="System.String" name="AreaName" #>
+<#@ parameter type="System.String" name="ContextTypeName" #>
+<#@ parameter type="System.String" name="ModelTypeName" #>
+<#@ parameter type="System.String" name="ModelVariable" #>
+<#@ parameter type="Microsoft.AspNet.Scaffolding.Core.Metadata.ModelMetadata" name="ModelMetadata" #>
+<#@ parameter type="System.String" name="EntitySetVariable" #>
+<#@ parameter type="System.Boolean" name="UseAsync" #>
+<#@ parameter type="System.Boolean" name="IsOverpostingProtectionRequired" #>
+<#@ parameter type="System.String" name="BindAttributeIncludeText" #>
+<#@ parameter type="System.String" name ="OverpostingWarningMessage" #>
+<#@ parameter type="System.Collections.Generic.HashSet<System.String>" name="RequiredNamespaces" #>
+<# //Debugger.Launch(); 
+#>
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+<# if (UseAsync) { #>
+using System.Threading.Tasks;
+<# } #>
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using Newtonsoft.Json;
+using MainOffice.Functions;
+using MainOffice.App_LocalResources;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+<# foreach (var namespaceName in RequiredNamespaces) { #>
+using <#= namespaceName #>;
+<# } #>
+
+namespace <#= Namespace #>
+{
+<#
+    var contextTypeName = ContextTypeName;
+    var entitySetName = ModelMetadata.EntitySetName;
+    var entitySetVar = EntitySetVariable ?? (String.IsNullOrEmpty(entitySetName) ? entitySetName : (entitySetName.Substring(0, length:1).ToLowerInvariant() + entitySetName.Substring(1)));
+    var primaryKeyName = ModelMetadata.PrimaryKeys[0].PropertyName;
+    var primaryKeyShortTypeName = ModelMetadata.PrimaryKeys[0].ShortTypeName;
+    var primaryKeyDefaultValue = ModelMetadata.PrimaryKeys[0].DefaultValue;
+    var primaryKeyType = ModelMetadata.PrimaryKeys[0].TypeName;
+    var primaryKeyNullableTypeName = GetNullableTypeName(primaryKeyType, primaryKeyShortTypeName);
+    var lambdaVar = ModelVariable[0];
+    var relatedProperties = ModelMetadata.RelatedEntities.ToDictionary(item => item.AssociationPropertyName);
+	var properties = ModelMetadata.Properties.ToDictionary(item => item.PropertyName);
+    bool start = true;
+
+    string bindAttribute;
+    if (IsOverpostingProtectionRequired)
+    {
+        bindAttribute = String.Format("[Bind(Include = \"{0}\")] ", BindAttributeIncludeText);
+    }
+    else
+    {
+        bindAttribute = String.Empty;
+    }
+	
+	string bindFilterAttribute = T4Helpers.FilterBindAttributeIncludeText(ModelTypeName + "Filter"); 
+	bool FilterExists = false;
+	if (bindFilterAttribute != null) {
+		FilterExists = true;
+		if (IsOverpostingProtectionRequired)
+		{
+			bindFilterAttribute = String.Format("[Bind(Include = \"{0}\")] ", bindFilterAttribute);
+		}
+		else
+		{
+			bindFilterAttribute = String.Empty;
+		}
+    }
+	bool DelayedUpdateExists = T4Helpers.DelayedUpdateExists(ModelTypeName);
+#>	
+	[Authorize(Roles = "admin,director")]
+    public class <#= ControllerName #> : Controller
+    {
+        private <#= ContextTypeName #> db = new <#= ContextTypeName #>();
+
+        // GET: <#= routePrefix #>
+
+        public ActionResult Index(int? Edit)
+        {
+<#  var includeExpressions = "";
+        includeExpressions = String.Join("", relatedProperties.Values.Select(property => String.Format(".Include({0} => {0}.{1})", lambdaVar, property.AssociationPropertyName)));
+	    includeExpressions = includeExpressions + String.Join("", T4Helpers.GetIncludeProperties("MainOffice.Models." + ModelTypeName).Select(property => String.Format(".Include({0} => {0}.{1})", lambdaVar, property)));
+#>
+			if (Session["ScreenResolution"] != null)
+            {
+                double screenHeight = double.Parse(Session["ScreenResolution"].ToString().Substring(Session["ScreenResolution"].ToString().IndexOf("x") + 1));
+                double screenWidth = double.Parse(Session["ScreenResolution"].ToString().Substring(0, Session["ScreenResolution"].ToString().IndexOf("x")));
+                double tableHeight = screenHeight - (screenHeight / 100 * 19);
+                ViewBag.TableHeight = (int)tableHeight;
+            }
+            else
+            {
+                return RedirectToAction("GetResolution", "Home", new { returncontroller = RouteData.Values["controller"].ToString(), returnaction = RouteData.Values["action"].ToString() });
+            }
+			var <#= entitySetVar #> = db.<#= entitySetName #><#= includeExpressions #>;
+			ViewBag.ServerSide = false;
+			
+				if (<#= entitySetVar #>.Count() > 400)
+                ViewBag.ServerSide = true;
+			<# if (FilterExists) {#> 
+            <#= ModelTypeName #>Filter filter = new <#= ModelTypeName #>Filter();
+			<# }
+				if(!String.IsNullOrEmpty(includeExpressions)) { #>
+            
+		<# foreach (var property in relatedProperties.Values) { 
+		if (T4Helpers.IsHidden("MainOffice.Models." + ModelTypeName, property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName))))
+		{ continue; }#>
+			List<<#= property.ShortTypeName #>> <#= property.ShortTypeName #>List = db.<#= property.EntitySetName #>.ToList();
+			<# if (T4Helpers.IsNullable(ModelTypeName,property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)))) { #>
+			<#= property.ShortTypeName #>List.Insert(0, new <#= property.ShortTypeName #>() { Name = GlobalRes.Empty });
+			<# } #>
+			ViewBag.<#= property.EntitySetName #>SelectList = new MultiSelectList(<#= property.ShortTypeName #>List, "<#= property.PrimaryKeyNames[0] #>", "<#= property.DisplayPropertyName #>");
+            
+			<# } }
+			if (FilterExists) {#>
+			ViewBag.Filter = filter;
+            <#} #>
+			ViewBag.Edit = Edit.HasValue ? Edit.Value : 0;
+			return View(new List<<#= ModelTypeName #>>() { });
+		}
+
+        // GET: <#= routePrefix #>/Create
+        public ActionResult Create()
+        {
+			<# foreach (var property in relatedProperties.Values) { 
+				if (T4Helpers.IsHidden("MainOffice.Models." + ModelTypeName, property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName))))
+				{ continue; }#>
+			List<<#= property.ShortTypeName #>> <#= property.ShortTypeName #>List = db.<#= property.EntitySetName #>.ToList();
+			<# if (T4Helpers.IsNullable(ModelTypeName,property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)))) { #>
+				<#= property.ShortTypeName #>List.Insert(0, new <#= property.ShortTypeName #>() { Name = GlobalRes.Empty });
+			<# } #>
+
+            ViewBag.<#= property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)) #> = new SelectList(<#= property.ShortTypeName #>List, "<#= property.PrimaryKeyNames[0] #>", "<#= property.DisplayPropertyName #>");
+<# } #>
+            return PartialView();
+        }
+
+        // POST: <#= routePrefix #>/Create
+<# if (IsOverpostingProtectionRequired) {
+    foreach (var line in OverpostingWarningMessage.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)) { 
+#>
+        // <#= line #>
+<# } } #>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Create(<#= bindAttribute #><#= ModelTypeName #> <#= ModelVariable #>)
+<# } else { #>
+        public ActionResult Create(<#= bindAttribute #><#= ModelTypeName #> <#= ModelVariable #>)
+<# } #>
+        {
+            if (ModelState.IsValid)
+            {
+			<# if (DelayedUpdateExists | ModelTypeName.Contains("DelayedUpdate")) { #>
+				if (await DelayedUpdateIsValid(<#= ModelVariable #>))
+                {
+				<# } #>
+<# if(!String.IsNullOrEmpty(primaryKeyType) && String.Equals("System.Guid", primaryKeyType, StringComparison.OrdinalIgnoreCase)) { #>
+                <#= ModelVariable #>.<#= primaryKeyName #> = Guid.NewGuid();
+<# } #>
+<# foreach (var property in relatedProperties.Values) { 
+if (T4Helpers.IsNullable(ModelTypeName, property.ForeignKeyPropertyNames[0])) {#>
+				<#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #> = SetValueToNull(<#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #>);
+				<# } else { #>
+				<#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #> = <#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #>;
+<#} } #>
+                db.<#= entitySetName #>.Add(<#= ModelVariable #>);
+<# if (UseAsync) {#>
+                string[] saveResult = await Function.SaveChangesToDb(db);
+				if (saveResult[0] == "success")
+                    {
+				<#= ModelVariable #> = await db.<#= entitySetName #><#= includeExpressions #>.FirstAsync(<#= lambdaVar #> => <#= lambdaVar #>.<#= primaryKeyName #> == <#= ModelVariable #>.<#= primaryKeyName #>);
+<# } else { #>
+                string[] saveResult =  Function.SaveChangesToDb(db).Result;
+				if (saveResult[0] == "success")
+                    {
+					<#= ModelVariable #> = db.<#= entitySetName #><#= includeExpressions #>.First(<#= lambdaVar #> => <#= lambdaVar #>.<#= primaryKeyName #> == <#= ModelVariable #>.<#= primaryKeyName #>);
+<# } #>
+					return Json(new { result = "success", data = GetJsonViewModel(<#= ModelVariable #>) }, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        if (saveResult[1].Contains("IX_<#= ModelTypeName.Contains("DelayedUpdate") ? ModelTypeName.Substring(13) : ModelTypeName #>Unique"))
+                        {
+                            ModelState.AddModelError(String.Empty, GlobalRes.DuplicateDataError);
+                            <# IEnumerable<PropertyInfo> uniqueProperties = T4Helpers.GetUniqueProperties(ModelTypeName.Contains("DelayedUpdate") ? ModelTypeName.Substring(13) : ModelTypeName );
+							foreach (PropertyInfo property in uniqueProperties )
+								{ #>
+									ModelState.AddModelError("<#= property.Name #>", GlobalRes.Duplicate);
+								<# } #>
+						}
+                        else
+                        {
+                            ModelState.AddModelError(String.Empty, saveResult[1]);
+                        }
+                    }
+                
+				<# if (DelayedUpdateExists | ModelTypeName.Contains("DelayedUpdate")) { #>
+				}
+				else
+				{
+						<# if (DelayedUpdateExists) { #>
+						ModelState.AddModelError(String.Empty, GlobalRes.ErrDelayedUpdateExists);
+						<#	foreach (PropertyInfo property in uniqueProperties )
+								{ #>
+									ModelState.AddModelError("<#= property.Name #>", GlobalRes.DelayedUpdate);
+								<# } 
+						} else { #>
+						ModelState.AddModelError(String.Empty, GlobalRes.ErrParentTableData);
+						<#	foreach (PropertyInfo property in uniqueProperties )
+								{ #>
+									ModelState.AddModelError("<#= property.Name #>", GlobalRes.Duplicate);
+								<# } 
+						 } #>
+					
+				}
+				<# } #>
+            }
+
+<# foreach (var property in relatedProperties.Values) { 
+if (T4Helpers.IsHidden("MainOffice.Models." + ModelTypeName, property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName))))
+		{ continue; }#>
+			List<<#= property.ShortTypeName #>> <#= property.ShortTypeName #>List = db.<#= property.EntitySetName #>.ToList();
+			<# if (T4Helpers.IsNullable(ModelTypeName,property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)))) { #>
+				<#= property.ShortTypeName #>List.Insert(0, new <#= property.ShortTypeName #>() { Name = GlobalRes.Empty });
+			<# } #>
+
+            ViewBag.<#= property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)) #> = new SelectList(<#= property.ShortTypeName #>List, "<#= property.PrimaryKeyNames[0] #>", "<#= property.DisplayPropertyName #>");
+<# } #>
+            return PartialView(<#= ModelVariable #>);
+        }
+
+        // GET: <#= routePrefix #>/Edit/5
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Edit(<#= primaryKeyNullableTypeName #> id)
+<# } else { #>
+        public ActionResult Edit(<#= primaryKeyNullableTypeName #> id)
+<# } #>
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+<# if (UseAsync) { #>
+            <#= ModelTypeName #> <#= ModelVariable #> = await db.<#= entitySetName #>.FindAsync(id);
+<# } else { #>
+            <#= ModelTypeName #> <#= ModelVariable #> = db.<#= entitySetName #>.Find(id);
+<# } #>
+            if (<#= ModelVariable #> == null)
+            {
+                return RedirectToAction("NotFound", "Home", new NotFoundViewModel() { Title = GlobalRes.Edit, OriginalViewAction = GlobalRes.<#= ModelTypeName #>ShortName + " " + GlobalRes.Edit, Message = "404. Данная запись отсутствует." });
+            }
+			ViewBag.Concurrency = false;
+<# foreach (var property in relatedProperties.Values) { 
+if (T4Helpers.IsHidden("MainOffice.Models." + ModelTypeName, property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName))))
+		{ continue; }#>
+			List<<#= property.ShortTypeName #>> <#= property.ShortTypeName #>List = db.<#= property.EntitySetName #>.ToList();
+			<# if (T4Helpers.IsNullable(ModelTypeName,property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)))) { #>
+				<#= property.ShortTypeName #>List.Insert(0, new <#= property.ShortTypeName #>() { Name = GlobalRes.Empty });
+			<# } #>
+
+            ViewBag.<#= property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)) #> = new SelectList(<#= property.ShortTypeName #>List, "<#= property.PrimaryKeyNames[0] #>", "<#= property.DisplayPropertyName #>");
+<# } #>
+            return PartialView(<#= ModelVariable #>);
+        }
+
+        // POST: <#= routePrefix #>/Edit/5
+<# if (IsOverpostingProtectionRequired) {
+    foreach (var line in OverpostingWarningMessage.Split(new string[] { Environment.NewLine }, StringSplitOptions.None)) { 
+#>
+        // <#= line #>
+<# } } #>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Edit(<#= bindAttribute #><#= ModelTypeName #> <#= ModelVariable #>)
+<# } else { #>
+        public ActionResult Edit(<#= bindAttribute #><#= ModelTypeName #> <#= ModelVariable #>)
+<# } #>
+        {
+			ViewBag.Concurrency = false;
+            if (ModelState.IsValid)
+            {
+			<# if (DelayedUpdateExists | ModelTypeName.Contains("DelayedUpdate")) { #>
+				if (await DelayedUpdateIsValid(<#= ModelVariable #>))
+                {
+				<# } #>
+			<# foreach (var property in relatedProperties.Values) { 
+				if (T4Helpers.IsNullable(ModelTypeName, property.ForeignKeyPropertyNames[0])) {#>
+				<#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #> = SetValueToNull(<#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #>);
+				<# } else { #>
+				<#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #> = <#= ModelVariable #>.<#= property.ForeignKeyPropertyNames[0] #>;
+<#} } #>
+                db.Entry(<#= ModelVariable #>).State = EntityState.Modified;
+<# if (UseAsync) {#>
+                string[] saveResult = await Function.SaveChangesToDb(db);
+				if (saveResult[0] == "success")
+                    {
+				<#= ModelVariable #> = await db.<#= entitySetName #><#= includeExpressions #>.FirstAsync(<#= lambdaVar #> => <#= lambdaVar #>.<#= primaryKeyName #> == <#= ModelVariable #>.<#= primaryKeyName #>);
+<# } else { #>
+                string[] saveResult = Function.SaveChangesToDb(db).Result;
+				if (saveResult[0] == "success")
+                    {
+					<#= ModelVariable #> = db.<#= entitySetName #><#= includeExpressions #>.First(<#= lambdaVar #> => <#= lambdaVar #>.<#= primaryKeyName #> == <#= ModelVariable #>.<#= primaryKeyName #>);
+<# } #>
+					return Json(new { result = "success", data = GetJsonViewModel(<#= ModelVariable #>) }, JsonRequestBehavior.AllowGet);
+                    }
+					else if (saveResult[0] == "concurrencyError")
+                    {
+                        ModelState.AddModelError(String.Empty, saveResult[1]);
+                        ViewBag.Concurrency = true;
+                    }
+                    else
+                    {
+                        if (saveResult[1].Contains("IX_<#= ModelTypeName.Contains("DelayedUpdate") ? ModelTypeName.Substring(13) : ModelTypeName #>Unique"))
+                        {
+                            ModelState.AddModelError(String.Empty, GlobalRes.DuplicateDataError);
+                            <# foreach (PropertyInfo property in uniqueProperties )
+								{ #>
+									ModelState.AddModelError("<#= property.Name #>", GlobalRes.Duplicate);
+								<# } #>
+						}
+                        else
+                        {
+                            ModelState.AddModelError(String.Empty, saveResult[1]);
+                        }
+                    }
+                
+				<# if (DelayedUpdateExists | ModelTypeName.Contains("DelayedUpdate")) { #>
+				}
+				else
+				{
+						<# if (DelayedUpdateExists) { #>
+						ModelState.AddModelError(String.Empty, GlobalRes.ErrDelayedUpdateExists);
+						<#	foreach (PropertyInfo property in uniqueProperties )
+								{ #>
+									ModelState.AddModelError("<#= property.Name #>", GlobalRes.DelayedUpdate);
+								<# } 
+						} else { #>
+						ModelState.AddModelError(String.Empty, GlobalRes.ErrParentTableData);
+						<#	foreach (PropertyInfo property in uniqueProperties )
+								{ #>
+									ModelState.AddModelError("<#= property.Name #>", GlobalRes.Duplicate);
+								<# } 
+						 } #>
+					
+				}
+				<# } #>
+            
+			}
+
+<# foreach (var property in relatedProperties.Values) { 
+if (T4Helpers.IsHidden("MainOffice.Models." + ModelTypeName, property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName))))
+		{ continue; }#>
+			List<<#= property.ShortTypeName #>> <#= property.ShortTypeName #>List = db.<#= property.EntitySetName #>.ToList();
+			<# if (T4Helpers.IsNullable(ModelTypeName,property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)))) { #>
+				<#= property.ShortTypeName #>List.Insert(0, new <#= property.ShortTypeName #>() { Name = GlobalRes.Empty });
+			<# } #>
+
+            ViewBag.<#= property.ForeignKeyPropertyNames.First(p => p.Contains(property.ShortTypeName)) #> = new SelectList(<#= property.ShortTypeName #>List, "<#= property.PrimaryKeyNames[0] #>", "<#= property.DisplayPropertyName #>");
+<# } #>
+            return PartialView(<#= ModelVariable #>);
+        }
+
+        // GET: <#= routePrefix #>/Delete/5
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Delete(<#= primaryKeyNullableTypeName #> id, bool? concurrencyError, string message)
+<# } else { #>
+        public ActionResult Delete(<#= primaryKeyNullableTypeName #> id, bool? concurrencyError, string message)
+<# } #>
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+			if (concurrencyError.GetValueOrDefault())
+            {
+                ViewBag.ConcurrencyError = message;
+            }
+            else
+            {
+                message = "404. Данная запись отсутствует.";
+            }
+<# if(!String.IsNullOrEmpty(includeExpressions)) { #>
+            
+<# if (UseAsync) { #>
+            <#= ModelTypeName #> <#= ModelVariable #> = await db.<#= entitySetName #><#= includeExpressions #>.SingleOrDefaultAsync(<#= String.Format("{0} => {0}.{1} == id.Value", lambdaVar, primaryKeyName) #>);
+<# } else { #>
+            <#= ModelTypeName #> <#= ModelVariable #> = db.<#= entitySetName #><#= includeExpressions #>.SingleOrDefault(<#= String.Format("{0} => {0}.{1} == id.Value", lambdaVar, primaryKeyName) #>);
+<# } #>
+<# } else { #>
+<#		if (UseAsync) { #>
+            <#= ModelTypeName #> <#= ModelVariable #> = await db.<#= entitySetName #>.SingleOrDefaultAsync(<#= String.Format("{0} => {0}.{1} == id.Value", lambdaVar, primaryKeyName) #>);
+<#		} else { #>
+            <#= ModelTypeName #> <#= ModelVariable #> = db.<#= entitySetName #>.SingleOrDefault(<#= String.Format("{0} => {0}.{1} == id.Value", lambdaVar, primaryKeyName) #>);
+<#		} #>
+<# } #>
+            if (<#= ModelVariable #> == null)
+            {
+                return RedirectToAction("NotFound","Home",new NotFoundViewModel() { Title = GlobalRes.Delete, OriginalViewAction = GlobalRes.DeleteConfirm, Message = message });
+            }
+            return PartialView(<#= ModelVariable #>);
+        }
+
+        // POST: <#= routePrefix #>/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+<# if (UseAsync) { #>
+        public async Task<ActionResult> Delete(<#= ModelTypeName #> <#= ModelVariable #>)
+<# } else { #>
+        public ActionResult DeleteConfirmed(<#= ModelTypeName #> <#= ModelVariable #>)
+<# } #>
+        {
+<# if (UseAsync) { #>
+            
+			<# if (DelayedUpdateExists) { #>
+				if (await DelayedUpdateIsValid(<#= ModelVariable #>))
+                {
+				<# } #>
+<# } else { #>
+            
+			<# if (DelayedUpdateExists) { #>
+				if (DelayedUpdateIsValid(<#= ModelVariable #>))
+                {
+				<# } #>
+<# } #>
+            db.Entry(<#= ModelVariable #>).State = EntityState.Deleted;
+<# if (UseAsync) { #>
+            string[] saveResult = await Function.SaveChangesToDb(db);
+                
+<# } else { #>
+            string[] saveResult = Function.SaveChangesToDb(db).Result;
+<# } #>
+			if (saveResult[0] == "concurrencyError")
+                {
+                    return RedirectToAction("Delete", new { concurrencyError = true, id = <#= ModelVariable #>.<#= primaryKeyName #>, message = saveResult[1] });
+                }
+            return new JsonResult()
+                {
+                    JsonRequestBehavior = JsonRequestBehavior.DenyGet,
+                    Data = new { result = saveResult[0], message = saveResult[1], value = <#= ModelVariable #>.<#= primaryKeyName #> }
+                };
+			<# if (DelayedUpdateExists) { #>
+				}
+			else
+            {
+                return new JsonResult()
+                {
+                    JsonRequestBehavior = JsonRequestBehavior.DenyGet,
+                    Data = new { result = "fail", message = GlobalRes.ErrDelayedUpdateExists }
+                };
+            }
+				<# } #>
+			
+        }
+
+		[HttpPost]
+		<# if (UseAsync) { #>
+        public async Task<ActionResult> RefreshRow(int id)
+		<# } else { #>
+		public ActionResult RefreshRow(int id)
+		<# } #>
+        {
+		<# if (UseAsync) { #>
+            <#= ModelTypeName #> <#= ModelVariable #> = await db.<#= entitySetName #><#= !String.IsNullOrEmpty(includeExpressions) ? includeExpressions : "" #>.SingleOrDefaultAsync(<#= String.Format("{0} => {0}.{1} == id", lambdaVar, primaryKeyName) #>);
+			<# } else { #>
+			<#= ModelTypeName #> <#= ModelVariable #> = db.<#= entitySetName #><#= !String.IsNullOrEmpty(includeExpressions) ? includeExpressions : "" #>.SingleOrDefault(<#= String.Format("{0} => {0}.{1} == id", lambdaVar, primaryKeyName) #>);
+			<# } #>
+            if (<#= ModelVariable #> == null)
+            return Json(new { result = "delete" }, JsonRequestBehavior.DenyGet);
+            return Json(new { result = "edit", data = GetJsonViewModel(<#= ModelVariable #>) }, JsonRequestBehavior.DenyGet);
+        }
+
+		[HttpPost]
+        [ValidateAntiForgeryToken]
+		<# if (UseAsync) { #>
+        public async Task<JsonResult> DeleteList(int[] ids)
+<# } else { #>
+        public JsonResult DeleteList(int[] ids)
+<# } #>
+        
+        {
+            List<<#= ModelTypeName #>> <#= entitySetVar #>;
+            
+                for (int i = 0; i <= ids.Length/500; i++)
+                {
+                    int[] x;
+                    if (i == 0)
+                    {
+                        x = ids.Take(500).ToArray();
+                    }
+                    else
+                    {
+                        x = ids.Skip(500 * i).Take(500).ToArray();
+                    }
+                    <#= entitySetVar #> = await db.<#= entitySetName #>.Where(e => x.Contains(e.<#= primaryKeyName #>)).ToListAsync();
+                    db.<#= entitySetName #>.RemoveRange(<#= entitySetVar #>);
+
+                }
+				<# if (UseAsync) { #>
+            string[] saveResult = await Function.SaveChangesToDb(db);
+			<# } else { #>
+			string[] saveResult = Function.SaveChangesToDb(db).Result;
+			<# } #>
+			<# if (DelayedUpdateExists) { #>
+			if (saveResult[1].Contains("REFERENCE") && saveResult[1].Contains("DelayedUpdate"))
+            {
+                saveResult[1] = GlobalRes.ErrDelayedUpdateExists;
+            }
+				<# } #>
+			return new JsonResult()
+            {
+                JsonRequestBehavior = JsonRequestBehavior.DenyGet,
+                Data = new { result = saveResult[0], message = saveResult[1] }
+            };
+        }
+<# if (DelayedUpdateExists) { #>
+		[HttpPost]
+        [ValidateAntiForgeryToken]
+		<# if (UseAsync) { #>
+        public async Task<JsonResult> DelayedUpdate(int[] ids)
+<# } else { #>
+        public JsonResult DelayedUpdate(int[] ids)
+<# } #>
+        {
+            var <#= entitySetVar #> = db.<#= entitySetName #><#= String.IsNullOrEmpty(includeExpressions) ? ".AsQueryable()" : includeExpressions #>;
+            for (int i = 0; i < ids.Length; i++)
+            {
+                int x = ids[i];
+                DelayedUpdate<#= ModelTypeName #> delayedUpdate<#= ModelTypeName #> = await db.DelayedUpdate<#= entitySetName #>.FirstOrDefaultAsync(e => e.<#= ModelTypeName #>Id == x);
+                if (delayedUpdate<#= ModelTypeName #> != null)
+                {
+                    continue;
+                }
+                <#= ModelTypeName #> <#= ModelVariable #>;
+                try
+                { 
+                    <#= ModelVariable #> = await <#= entitySetVar #>.SingleAsync(e => e.Id == x);
+                }
+                catch
+                {
+                    continue;
+                }
+                delayedUpdate<#= ModelTypeName #> = new DelayedUpdate<#= ModelTypeName #>(<#= ModelVariable #>);
+
+                db.DelayedUpdate<#= entitySetName #>.Add(delayedUpdate<#= ModelTypeName #>);
+            }
+			await Function.SaveChangesToDb(db);
+            string result = "success";
+            string url = "/DelayedUpdate<#= ControllerName.Substring(0,ControllerName.IndexOf("Controller")) #>/";
+            
+            return new JsonResult()
+            {
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet,
+                Data = new { result, url }
+            };
+        }
+
+		private async Task<bool> DelayedUpdateIsValid(<#= ModelTypeName #> <#= ModelVariable #>)
+        {
+            try
+            {
+                await db.DelayedUpdate<#= entitySetName #>.SingleAsync(e => e.<#= ModelTypeName #><#= primaryKeyName #> == <#= ModelVariable #>.<#= primaryKeyName #> | (<#	start = true; 
+								foreach (PropertyInfo property in uniqueProperties )
+									{   
+										if (start) { #>
+									e.<#= property.Name #> == <#= ModelVariable #>.<#= property.Name #>
+									<# start = false; } else { #>
+									& e.<#= property.Name #> == <#= ModelVariable #>.<#= property.Name #>
+									<# } #>
+								<# } #>));
+                return false;
+            }
+            catch (Exception e)
+            {
+                if (e.HResult == -2146233079)
+                { 
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+		<# } #>
+<# if (ModelTypeName.Contains("DelayedUpdate")) { #>
+		[HttpPost]
+        [ValidateAntiForgeryToken]
+		<# if (UseAsync) { #>
+         public async Task<JsonResult> SetUpdateDate(int[] ids, string date)
+<# } else { #>
+         public JsonResult SetUpdateDate(int[] ids, string date)
+<# } #>
+		{
+            DateTime updateDate;
+            bool success = DateTime.TryParse(date,out updateDate);
+            string result = "fail";
+            string message = null;
+            List<<#= ModelTypeName #>JsonViewModel> data = new List<<#= ModelTypeName #>JsonViewModel>();
+            if (success)
+            {
+                for (int i = 0; i < ids.Length; i++)
+                {
+                    int x = ids[i];
+                    <#= ModelTypeName #> <#= ModelVariable #> = await db.<#= entitySetName #>.FindAsync(ids[i]);
+                    if (<#= ModelVariable #> == null)
+                    {
+                        continue;
+                    }
+                    <#= ModelVariable #>.UpdateDate = updateDate;
+                    db.Entry(<#= ModelVariable #>).State = EntityState.Modified;
+                }
+                string[] saveResult = await Function.SaveChangesToDb(db);
+                if (saveResult[0]=="success")
+                {
+					
+					List<<#= ModelTypeName #>> <#= entitySetVar #> = new List<<#= ModelTypeName #>>();
+
+					for (int i = 0; i <= ids.Length / 500; i++)
+					{
+						int[] x;
+						if (i == 0)
+						{
+							x = ids.Take(500).ToArray();
+						}
+						else
+						{
+							x = ids.Skip(500 * i).Take(500).ToArray();
+						}
+						<#= entitySetVar #>.AddRange(await db.<#= entitySetName #><#= String.IsNullOrEmpty(includeExpressions) ? ".AsQueryable()" : includeExpressions #>.Where(e => x.Contains(e.Id)).ToListAsync());
+					}
+
+					data = GetJsonViewModel(<#= entitySetVar #>);
+                }
+				result = saveResult[0];
+                message = saveResult[1];
+            }
+            else
+            { 
+                message = GlobalRes.WrongDateFormat;
+            }
+            return new JsonResult()
+            {
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet,
+                Data = new { result, message, data }
+            };
+        }
+
+		private async Task<bool> DelayedUpdateIsValid(<#= ModelTypeName #> <#= ModelVariable #>)
+        {
+            try
+            {
+                <#= ModelTypeName.Substring(13) #> checkItem = await db.<#= entitySetName.Substring(13) #>.SingleAsync(e => <#	start = true; 
+								foreach (PropertyInfo property in uniqueProperties )
+									{   
+										if (start) { #>
+									e.<#= property.Name #> == <#= ModelVariable #>.<#= property.Name #>
+									<# start = false; } else { #>
+									& e.<#= property.Name #> == <#= ModelVariable #>.<#= property.Name #>
+									<# } #>
+								<# } #>);
+				if (<#= ModelVariable #>.<#= ModelTypeName.Substring(13) #>Id != null)
+                {
+                    if (<#= ModelVariable #>.<#= ModelTypeName.Substring(13) #>Id == checkItem.Id)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                if (e.HResult == -2146233079)
+                { 
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+		<# } #>
+<# if (UseAsync) { #>
+		public async Task<JsonResult> Data(string search, string sort, string order, int? offset, int? limit<# if (FilterExists){ #>, string datafilter = null<# } #>)
+<# } else { #>
+        public JsonResult Data(string search, string sort, string order, int? offset, int? limit<# if (FilterExists){ #>, string datafilter = null<# } #>)
+<# } #>
+        {
+            var <#= entitySetVar #> = db.<#= entitySetName #><#= String.IsNullOrEmpty(includeExpressions) ? ".AsQueryable()" : includeExpressions #>;
+            
+			
+			int TotalNotFiltered = <#= entitySetVar #>.Count();
+			        
+            
+
+            int Total = TotalNotFiltered;
+			<# if (FilterExists){ #>
+            if (datafilter != null)
+            { 
+                <#= entitySetVar #> = BuildFilter(<#= entitySetVar #>, JsonConvert.DeserializeObject<<#= ModelTypeName #>Filter>(datafilter));
+                Total = <#= entitySetVar #>.Count();
+			}
+			<# } #>
+            bool serverSide = Total > 400 ? true : false;
+            if (!String.IsNullOrEmpty(search) & serverSide)
+            {
+                string dateSearch = search;
+                // Работает только в культуре с форматом даты дд.мм.гггг
+
+				<# start = true; 
+				foreach (var property in properties.Values) { 
+					if (property.IsPrimaryKey | property.IsForeignKey | !property.Scaffold)
+						continue;
+					if (property.IsAssociation){ 
+						if (relatedProperties.Keys.Contains(property.PropertyName)){
+							if (start) { #>
+								<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => <#= lambdaVar #>.<#= property.PropertyName #>.<#= property.RelatedModel.DisplayPropertyName #>.Contains(search) <# start = false; 
+							} else {#>
+								|| <#= lambdaVar #>.<#= property.PropertyName #>.<#= property.RelatedModel.DisplayPropertyName #>.Contains(search)<# 
+							}
+                        }
+                    }
+					else
+                    {
+					switch (T4Helpers.GetDataTypeName("MainOffice.Models." + ModelTypeName, property.PropertyName)){
+					case "Date": 
+						if (start) { #>
+							<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => (<#= lambdaVar #>.<#= property.PropertyName #>.ToString().Substring(8, 2) + "." + <#= lambdaVar #>.<#= property.PropertyName #>.ToString().Substring(5, 2) + "." + <#= lambdaVar #>.<#= property.PropertyName #>.ToString().Substring(0, 4)).Contains(search) <# start = false; 
+						} else {#>
+							|| (<#= lambdaVar #>.<#= property.PropertyName #>.ToString().Substring(8, 2) + "." + <#= lambdaVar #>.<#= property.PropertyName #>.ToString().Substring(5, 2) + "." + <#= lambdaVar #>.<#= property.PropertyName #>.ToString().Substring(0, 4)).Contains(search)<# }
+						break;
+					case "PhoneNumber": 
+						if (start) { #>
+							<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => (<#= lambdaVar #>.<#= property.PropertyName #>.Substring(1, 3) + <#= lambdaVar #>.<#= property.PropertyName #>.Substring(6, 3) + <#= lambdaVar #>.<#= property.PropertyName #>.Substring(10, 2) + <#= lambdaVar #>.<#= property.PropertyName #>.Substring(13, 2)).Contains(search) 
+							|| <#= lambdaVar #>.<#= property.PropertyName #>.Contains(search) <# start = false; 
+						} else {#>
+							|| (<#= lambdaVar #>.<#= property.PropertyName #>.Substring(1, 3) + <#= lambdaVar #>.<#= property.PropertyName #>.Substring(6, 3) + <#= lambdaVar #>.<#= property.PropertyName #>.Substring(10, 2) + <#= lambdaVar #>.<#= property.PropertyName #>.Substring(13, 2)).Contains(search)
+							|| <#= lambdaVar #>.<#= property.PropertyName #>.Contains(search)<# }
+						break;
+					default:
+						if (start) { #>
+							<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => <#= lambdaVar #>.<#= property.PropertyName #>.ToString().Contains(search) <# start = false; 
+						} else {#>
+							|| <#= lambdaVar #>.<#= property.PropertyName #>.ToString().Contains(search)<# }
+						break;
+					} } } #>);
+                Total = <#= entitySetVar #>.Count();
+			}
+
+             
+            if (sort != null)
+            {
+                <#= entitySetVar #> = Function.OrderBy(<#= entitySetVar #>, sort, order);
+            }
+            else
+            {
+                <#= entitySetVar #> = <#= entitySetVar #>.OrderBy(e => e.Id);
+            }
+            
+            if (serverSide)
+            {                
+                <#= entitySetVar #> = <#= entitySetVar #>.Skip(offset.Value);
+				<# if (UseAsync) { #>
+				BootsrapTableServerDataFormat data = new BootsrapTableServerDataFormat(GetJsonViewModel(await <#= entitySetVar #>.Take(limit.Value).ToListAsync()), Total, TotalNotFiltered);
+				<# } else { #>
+				BootsrapTableServerDataFormat data = new BootsrapTableServerDataFormat(GetJsonViewModel(<#= entitySetVar #>.Take(limit.Value).ToList()), Total, TotalNotFiltered);
+				<# } #>
+                return Json(data, JsonRequestBehavior.AllowGet);
+            }
+			else
+			{
+            <# if (UseAsync) { #>
+			return Json(GetJsonViewModel(await <#= entitySetVar #>.ToListAsync()), JsonRequestBehavior.AllowGet);
+			<# } else { #>
+			return Json(GetJsonViewModel(<#= entitySetVar #>.ToList()), JsonRequestBehavior.AllowGet);
+			<# } #>
+            }
+}
+
+<# if (FilterExists) { #>
+		[HttpPost]
+        [ValidateAntiForgeryToken]
+		public ActionResult Filter(<#= bindFilterAttribute #><#= ModelTypeName #>Filter dataFilter)
+		{
+			if (ModelState.IsValid)
+            {
+				<# foreach (var property in relatedProperties.Values) { 
+					if (!T4Helpers.FilterExists(ModelTypeName + "Filter",property.ForeignKeyPropertyNames[0].ToString() + "Selected"))
+                    {
+						continue;
+					}
+				if (T4Helpers.IsNullable(ModelTypeName,property.ForeignKeyPropertyNames[0].ToString())) { #>
+					if (dataFilter.<#= property.ForeignKeyPropertyNames[0] #>Selected != null && (db.<#= property.EntitySetName #>.Count() + 1) == dataFilter.<#= property.ForeignKeyPropertyNames[0] #>Selected.Length)
+                        dataFilter.<#= property.ForeignKeyPropertyNames[0] #>Selected = null;
+               <# } else {#>
+					if (dataFilter.<#= property.ForeignKeyPropertyNames[0] #>Selected != null && db.<#= property.EntitySetName #>.Count() == dataFilter.<#= property.ForeignKeyPropertyNames[0] #>Selected.Length)
+                        dataFilter.<#= property.ForeignKeyPropertyNames[0] #>Selected = null;
+				<# } } #>	
+                                
+                var <#= entitySetVar #> = db.<#= entitySetName #><#= includeExpressions #>;
+
+                if (dataFilter != null)
+                {
+                    <#= entitySetVar #> = BuildFilter(<#= entitySetVar #>, dataFilter);
+                }
+								
+				int Count = <#= entitySetVar #>.Count();
+				
+                return new JsonResult()
+                {
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet,
+                    Data = new { result = "success", ServerSide = Count > 400 ? true : false, dataFilter = JsonConvert.SerializeObject(dataFilter) }
+                };
+            }
+            return new JsonResult()
+            {
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet,
+                Data = new { result = "notValid", data = ModelState }
+            };
+        }
+
+		private IQueryable<<#= ModelTypeName #>> BuildFilter(IQueryable<<#= ModelTypeName #>> <#= entitySetVar #>, <#= ModelTypeName #>Filter filter)
+        {
+			<# PropertyInfo[] Properties = T4Helpers.GetProperties(ModelTypeName + "Filter");
+			foreach (PropertyInfo property in Properties)
+			{
+				if (property.Name.Length > 4 && property.Name.Substring(property.Name.Length - 4,4) == "From")
+                { #>
+					if (filter.<#= property.Name #> != null)
+					<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => <#= lambdaVar #>.<#= property.Name.Substring(0,property.Name.Length - 4) #> >= filter.<#= property.Name #>);
+			<# 	}
+				if (property.Name.Length > 2 && property.Name.Substring(property.Name.Length - 2,2) == "To")
+                { #>
+					if (filter.<#= property.Name #> != null)
+					<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => <#= lambdaVar #>.<#= property.Name.Substring(0,property.Name.Length - 2) #> <= filter.<#= property.Name #>);
+			<#	}
+				if (property.Name.Length > 7 && property.Name.Substring(property.Name.Length - 7,7) == "Buttons")
+                { #>
+					if (filter.<#= property.Name #> == 1)
+					{
+						<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => <#= lambdaVar #>.<#= property.Name.Substring(0,property.Name.Length - 7) #> != null);
+					}
+					else if (filter.<#= property.Name #> == 2)
+					{
+						<#= entitySetVar #> = <#= entitySetVar #>.Where(<#= lambdaVar #> => <#= lambdaVar #>.<#= property.Name.Substring(0,property.Name.Length - 7) #> == null);
+					}
+			<#	}
+				if (property.Name.Length > 8 && property.Name.Substring(property.Name.Length - 8,8) == "Selected")
+                { #>
+					if (filter.<#= property.Name #> != null)
+					{
+						<#= entitySetVar #> = <#= entitySetVar #>.WhereFilter("<#= property.Name.Substring(0,property.Name.Length - 8) #>", filter.<#= property.Name #>);
+					}
+			<# 	}
+			}#>
+            
+            return <#= entitySetVar #>;
+        }
+<# } #>
+		private List<<#= ModelTypeName #>JsonViewModel> GetJsonViewModel(List<<#= ModelTypeName #>> baseResponse)
+        {
+            List<<#= ModelTypeName #>JsonViewModel> result = new List<<#= ModelTypeName #>JsonViewModel>();
+            foreach (<#= ModelTypeName #> item in baseResponse)
+            {
+                result.Add(new <#= ModelTypeName #>JsonViewModel(item<#= DelayedUpdateExists | ModelTypeName.Contains("DelayedUpdate") ? ", true" : "" #>));
+            }
+            return result;
+        }
+        private <#= ModelTypeName #>JsonViewModel GetJsonViewModel(<#= ModelTypeName #> baseResponse)
+        {
+            return new <#= ModelTypeName #>JsonViewModel(baseResponse<#= DelayedUpdateExists | ModelTypeName.Contains("DelayedUpdate") ? ", true" : "" #>);
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+		private int? SetValueToNull(int? value)
+        {
+            if (IsOfNullableType(value))
+            {
+                if (value == 0)
+                {
+                    return null;
+                }
+            }
+            return value;
+        }
+
+		private bool IsOfNullableType<T>(T o)
+        {
+            var type = typeof(T);
+            return Nullable.GetUnderlyingType(type) != null;
+        }
+    }
+	
+}
+ 
+<#+
+// This function converts the primary key short type name to its nullable equivalent when possible. This is required to make
+// sure that an HTTP 400 error is thrown when the user tries to access the edit, delete, or details action with null values.
+    string GetNullableTypeName(string typeName, string shortTypeName)
+    {
+        // The exceptions are caught because if for any reason the type is user defined, then the short type name will be used.
+        // In that case the user will receive a server error if null is passed to the edit, delete, or details actions.
+        Type primaryKeyType = null;
+        try
+        {
+            primaryKeyType = Type.GetType(typeName);
+        }
+        catch
+        {
+        }
+        if (primaryKeyType != null && (primaryKeyType.IsPrimitive || IsGuid(typeName)))
+        {
+            return shortTypeName + "?";
+        }
+        return shortTypeName;
+    }
+
+    bool IsGuid(string typeName) {
+        return String.Equals("System.Guid", typeName, StringComparison.OrdinalIgnoreCase);
+    }
+#>

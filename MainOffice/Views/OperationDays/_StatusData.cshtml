@@ -1,0 +1,197 @@
+﻿@model MainOffice.Models.OperDayStatisticsViewModel
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+<div class="row no-gutters">
+    @{string Color = "";}
+    @for (int i = 0; i < Model.Employees.Count; i++)
+    {
+        if (Model.Employees[i].IsClosed)
+        {
+            continue;
+        }
+
+
+        <div class="col-auto" @*style="width:19.6vw;"*@>
+            <div class="row no-gutters">
+                <div class="@(Color != Model.Employees[i].Color ? "rounded-left " : "" )@(Model.Employees.Count - 1 != i ? Model.Employees[i].Color != Model.Employees[i+1].Color ? "rounded-right " : "" : "rounded-right ")w-100 text-center" style="background-color:#@Model.Employees[i].Color">
+                    @(Color != Model.Employees[i].Color ? Html.Raw("<span class=\"text-light\">" + (Model.Employees[i].BarberLevel != "-" ? Model.Employees[i].BarberLevel : Model.Employees[i].Profession) + "</span>") : Html.Raw("<span style=\"color:#" + Model.Employees[i].Color + "\">.</span>") )
+                </div>
+            </div>
+            <div class="row no-gutters rounded-top border border-bottom-0 border-@(Model.Employees[i].IsWorking ? "danger" : "success")">
+                <div class="col-auto"><form method="post" action="@Url.Action("Bills", "OperationDays")"><input type="hidden" name="id" value="@Model.Employees[i].Id" /><input type="submit" class="btn btn-outline-info" value="Счета" /></form></div>
+                <div class="col-auto align-self-center ml-1 @(Model.Employees[i].IsWorking ? "text-danger" : "text-success")" style="font-weight:500;font-size:1.2rem">
+                    @(Model.Employees.Count - 1 == i ? Html.Raw("<a tabindex=\"0\" role=\"button\" id=\"popSumm" + Model.Id + "\" data-toggle=\"popover\">") : Html.Raw(""))@Model.Employees[i].EmployeeName@(Model.Employees.Count - 1 == i ? Html.Raw("</a>") : Html.Raw(""))
+                </div>
+            </div>
+            <div class="row no-gutters rounded-bottom border border-top-0 border-@(Model.Employees[i].IsWorking ? "danger" : "success") align-items-center">
+                <div class="col-auto">
+                    @if (Model.Employees[i].IsWorking)
+                    {
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">Время с начала обслуживания:</div>
+                            <div class="col-auto"><a tabindex="0" role="button" class="btn btn-@(Model.Employees[i].BillsInWork.Any(x=>x.CallForVisa) ? "primary" : "secondary") text-light float-right" data-toggle="popover" id="@("pop" + Model.Employees[i].Id)">@Model.Employees[i].TimeWorking@(Model.Employees[i].BillsInWork.Any(x => x.CallForVisa) ? Html.Raw(" <i id=\"excl" + Model.Employees[i].Id + "\" class=\"fas fa-exclamation\"></i>") : Html.Raw(""))</a></div>
+                        </div>
+                    }
+                    @if (Model.Employees[i].BillsToPay != null && Model.Employees[i].BillsToPay.Count > 0)
+                    {
+                        <div class="row no-gutters align-items-center pay">
+                            <div class="col-auto">Счета к оплате:</div>
+                            <div class="col-auto"><a tabindex="0" role="button" class="btn btn-warning text-light float-right" data-toggle="popover" id="@("popPay" + Model.Employees[i].Id)">@Model.Employees[i].BillsToPay.Count</a></div>
+                        </div>
+                    }
+                    @if (false)
+                    {
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">Время до следующей записи:</div>
+                            <div class="col-auto"><a class="btn btn-light" href="#">00:00</a></div>
+                        </div>
+                    }
+                </div>
+            </div>
+           
+        </div>
+
+        if (Model.Employees[i].IsWorking)
+        {
+            <div class="d-none" id="@("pop" + Model.Employees[i].Id + "content")">
+                @for (int y = 0; y < Model.Employees[i].BillsInWork.Count; y++)
+                {
+                    <span>@GlobalRes.BillShortName @(y + 1)</span>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" colspan="1">№ @Model.Employees[i].BillsInWork[y].BillNumber</th>
+                                <th scope="col" colspan="3">@GlobalRes.InitialPromo: @Model.Employees[i].BillsInWork[y].InitialPromo</th>
+                                <th scope="col" colspan="1">@GlobalRes.Summ:</th>
+                                <th scope="col" colspan="2">@Model.Employees[i].BillsInWork[y].Summ</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">№</th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsInWork[0].BillLines[0].CashRegCode)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsInWork[0].BillLines[0].ProductOrServiceName)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsInWork[0].BillLines[0].Promotion)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsInWork[0].BillLines[0].SellPrice)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsInWork[0].BillLines[0].Quantity)
+                                </th>
+                                <th scope="col">
+                                    @GlobalRes.Summ
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int z = 0; z < Model.Employees[i].BillsInWork[y].BillLines.Count; z++)
+                            {
+                                <tr @(Model.Employees[i].BillsInWork[y].BillLines[z].Cancel ? "class=bg-danger" : "")>
+                                    <th scope="row">@(i + 1)</th>
+                                    <td>@Model.Employees[i].BillsInWork[y].BillLines[z].CashRegCode</td>
+                                    <td>@Model.Employees[i].BillsInWork[y].BillLines[z].ProductOrServiceName</td>
+                                    <td>@Model.Employees[i].BillsInWork[y].BillLines[z].Promotion</td>
+                                    <td>@Model.Employees[i].BillsInWork[y].BillLines[z].SellPrice</td>
+                                    <td>@Model.Employees[i].BillsInWork[y].BillLines[z].Quantity</td>
+                                    <td>@Model.Employees[i].BillsInWork[y].BillLines[z].Summ</td>
+                                </tr>
+                            }
+                            @(Model.Employees[i].BillsInWork[y].CallForVisa ? (Html.Raw("<tr><td colspan=\"7\">").ToHtmlString() + Ajax.ActionLink("Подписать", "Sign", new { id = Model.Employees[i].BillsInWork[y].Id, card = Model.Employees[i].Id, version = Convert.ToBase64String(Model.Employees[i].BillsInWork[y].RowVersion) }, new AjaxOptions() { HttpMethod = "Post", OnSuccess = "signSuccess", OnFailure = "signFail" }, new { @class = "btn btn-primary", id = "buttonSign" + Model.Employees[i].BillsInWork[y].Id }) + Html.Raw("</td></tr>").ToHtmlString()): null)
+                        </tbody>
+                    </table>
+
+                }
+            </div>
+
+        }
+        if (Model.Employees[i].BillsToPay != null && Model.Employees[i].BillsToPay.Count > 0)
+        {
+            <div class="d-none pay" id="@("popPay" + Model.Employees[i].Id + "content")">
+                @for (int y = 0; y < Model.Employees[i].BillsToPay.Count; y++)
+                {
+                    <span>@GlobalRes.BillShortName @(y + 1)</span>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" colspan="1">№ @Model.Employees[i].BillsToPay[y].BillNumber</th>
+                                <th scope="col" colspan="3">@GlobalRes.InitialPromo: @Model.Employees[i].BillsToPay[y].InitialPromo</th>
+                                <th scope="col" colspan="1">@GlobalRes.Summ:</th>
+                                <th scope="col" colspan="2">@Model.Employees[i].BillsToPay[y].Summ</th>
+                            </tr>
+                            <tr>
+                                <th scope="col">№</th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsToPay[0].BillLines[0].CashRegCode)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsToPay[0].BillLines[0].ProductOrServiceName)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsToPay[0].BillLines[0].Promotion)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsToPay[0].BillLines[0].SellPrice)
+                                </th>
+                                <th scope="col">
+                                    @Html.DisplayNameFor(model => model.Employees[0].BillsToPay[0].BillLines[0].Quantity)
+                                </th>
+                                <th scope="col">
+                                    @GlobalRes.Summ
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int z = 0; z < Model.Employees[i].BillsToPay[y].BillLines.Count; z++)
+                            {
+                                <tr @(Model.Employees[i].BillsToPay[y].BillLines[z].Cancel ? "class=bg-danger" : "")>
+                                    <th scope="row">@(i + 1)</th>
+                                    <td>@Model.Employees[i].BillsToPay[y].BillLines[z].CashRegCode</td>
+                                    <td>@Model.Employees[i].BillsToPay[y].BillLines[z].ProductOrServiceName</td>
+                                    <td>@Model.Employees[i].BillsToPay[y].BillLines[z].Promotion</td>
+                                    <td>@Model.Employees[i].BillsToPay[y].BillLines[z].SellPrice</td>
+                                    <td>@Model.Employees[i].BillsToPay[y].BillLines[z].Quantity</td>
+                                    <td>@Model.Employees[i].BillsToPay[y].BillLines[z].Summ</td>
+                                </tr>
+                            }
+                                <tr id="@("tablePay" + Model.Employees[i].BillsToPay[y].Id)">
+                                    <td colspan="2">@Ajax.ActionLink(GlobalRes.Kasa, "Pay", new { id = Model.Employees[i].BillsToPay[y].Id, card = Model.Employees[i].Id, version = Convert.ToBase64String(Model.Employees[i].BillsToPay[y].RowVersion), param = 1 }, new AjaxOptions() { HttpMethod = "Post", OnSuccess = "paySuccess", OnFailure = "signFail" }, new { @class = "btn btn-outline-warning", id = "buttonKasa" + Model.Employees[i].BillsToPay[y].Id })</td>
+                                    <td colspan="2">@Ajax.ActionLink(GlobalRes.Terminal, "Pay", new { id = Model.Employees[i].BillsToPay[y].Id, card = Model.Employees[i].Id, version = Convert.ToBase64String(Model.Employees[i].BillsToPay[y].RowVersion), param = 2 }, new AjaxOptions() { HttpMethod = "Post", OnSuccess = "paySuccess", OnFailure = "signFail" }, new { @class = "btn btn-outline-warning", id = "buttonTerminal" + Model.Employees[i].BillsToPay[y].Id })</td>
+                                    <td colspan="2">@Ajax.ActionLink(GlobalRes.Deposit, "Pay", new { id = Model.Employees[i].BillsToPay[y].Id, card = Model.Employees[i].Id, version = Convert.ToBase64String(Model.Employees[i].BillsToPay[y].RowVersion), param = 3 }, new AjaxOptions() { HttpMethod = "Post", OnSuccess = "paySuccess", OnFailure = "signFail" }, new { @class = "btn btn-outline-warning", id = "buttonDeposit" + Model.Employees[i].BillsToPay[y].Id })</td>
+                                </tr>
+                            </tbody>
+                    </table>
+
+                }
+            </div>
+
+        }
+        Color = Model.Employees[i].Color;
+    }
+    <div class="d-none" id="@("popSumm" + Model.Id + "content")">
+        <table class="table-sm">
+            <thead>
+                <tr class="text-info">
+                    <th scope="col">@Html.DisplayNameFor(model => model.KasaSumm)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.TerminalSumm)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.DepositSumm)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.UnpaidSumm)</th>
+                    <th scope="col">@GlobalRes.Total закрытых</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="KasaSumm">@Html.DisplayFor(model => model.KasaSumm)</td>
+                    <td id="TerminalSumm">@Html.DisplayFor(model => model.TerminalSumm)</td>
+                    <td id="DepositSumm">@Html.DisplayFor(model => model.DepositSumm)</td>
+                    <td id="UnpaidSumm">@Html.DisplayFor(model => model.UnpaidSumm)</td>
+                    <td id="SummClosed">@Html.DisplayFor(model => model.SummClosed)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

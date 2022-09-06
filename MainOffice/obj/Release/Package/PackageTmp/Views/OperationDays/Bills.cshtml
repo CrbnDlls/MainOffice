@@ -1,0 +1,751 @@
+﻿@model IEnumerable<MainOffice.Models.MyBillsViewModel>
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+@{
+    ViewBag.Title = "Мои счета";
+}
+
+<div class="container"> 
+    @if (Model != null)
+    {
+        <div class="row">
+            <table class="table table-sm table-responsive table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col" colspan="5">
+                            @(Session["Worker"] != null ? Html.ActionLink(GlobalRes.Close + " - " + (string)ViewBag.Name, "Status", "OperationDays", null, new { @class = "btn btn-outline-danger" }) : Html.Raw("Мои счета"))</th>
+                        <th scope="col" colspan="2">@GlobalRes.Summ:</th>
+                        <th id="daySumm" scope="col" colspan="2">0</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">№</th>
+                        <th scope="col">Инфо</th>
+                        <th scope="col">@Html.DisplayNameFor(model => model.BillNumber)</th>
+                        <th scope="col">@Html.DisplayNameFor(model => model.ClientName)</th>
+                        <th scope="col">@Html.DisplayShortNameFor(model => model.StartTime)</th>
+                        <th scope="col">@Html.DisplayShortNameFor(model => model.EndTime)</th>
+                        <th scope="col">@Html.DisplayNameFor(model => model.BO)</th>
+                        <th scope="col">@Html.DisplayNameFor(model => model.Summ)</th>
+                        <th scope="col">@Ajax.CustomActionLink(Html.DisplayCustomForModel("Name") + " - " + GlobalRes.Create, "BillsCreate","OperationDays", null, new AjaxOptions { UpdateTargetId = "windowmodal", InsertionMode = InsertionMode.ReplaceWith, OnSuccess = "showModal", HttpMethod = "Get", OnFailure = "onFail" }, new { @class = "btn btn-outline-success" }, "fas fa-spinner fa-pulse")</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyBills">
+                    
+                </tbody>
+            </table>
+        </div>
+        <div id="windowmodal">
+
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning" role="alert">
+            Вам не выдан рабочий лист
+        </div>
+    }
+
+</div>
+<div class="d-none" id="loading">Загрузка...<i class="fas fa-compact-disc fa-pulse"></i></div>
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+@section scripts
+{
+    <script type="text/javascript">
+        var bill = {
+            id: 0,
+            BillNumber: 0,
+            Promotion: '',
+            BillLines: [],
+            Summ: 0,
+            BO: false
+        }
+        var bills = [];
+
+        function onSuccessCloseBill(data) {
+            if (data.result == 'success') {
+                document.getElementById('tdEnd' + data.id).innerHTML = data.data;
+                document.getElementById('tdClose' + data.id).innerHTML = '';
+                document.getElementById('trBill' + data.id).setAttribute('class', '');
+            }
+            else {
+                alert(data.message);
+            }
+        }
+
+
+        function showModal() {
+            $('#windowmodal').modal('show');
+            bill = {
+                Promotion: '',
+                BillLines: [],
+                Summ: 0,
+                BO: false,
+                version:''
+            };
+        }
+        function hideLineList() {
+            var elements = document.getElementsByClassName('lineList');
+            elements.forEach(element => element.setAttribute('style', 'display:none'));
+            document.getElementById('pricelistButtonClose').style.display = "block";
+        }
+        function showLineList() {
+            var elements = document.getElementsByClassName('lineList');
+            elements.forEach(element => {
+                if (element.className.indexOf('modal-header') != -1) {
+                    element.setAttribute('style', 'display:flex')
+                }
+                else
+                { element.setAttribute('style', 'display:block') }
+            });
+            document.getElementById('pricelistButtonClose').style.display = "none";
+        }
+        function BOChange(inpt) {
+            switch (inpt.id) {
+                case 'optionBO1':
+                    bill.BO = false;
+                    break;
+                case 'optionBO2':
+                    bill.BO = true;
+                    break;
+                default:
+                    bill.BO = false;
+                    break;
+            }
+        }
+        function promotionChange(inpt) {
+            switch (inpt.id)
+            {
+                case 'option2':
+                    bill.Promotion = '10%';
+                    break;
+                case 'option3':
+                    bill.Promotion = 'staff';
+                    break;
+                default:
+                    bill.Promotion = '';
+                    break;
+            }
+            if (bill.BillLines.length > 0)
+                {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetBillPrices", "OperationDays")",
+                data: {
+                    bill: bill,
+                    discount: bill.Promotion
+                },
+                beforeSend: function () {
+                    document.getElementById('promoSpinner').style.display = 'block'
+                },
+                success: function (data) {
+                    if (data.result === 'success') {
+                        bill.BillLines = [];
+                        for (var i = 0; i < data.bill.BillLines.length; i++) {
+                            var billLine = {
+                                Id: 0,
+                                CashRegCode: 0,
+                                ProductOrServiceName: '',
+                                Quantity: 0,
+                                SellPrice: 0,
+                                Summ: 0
+                            };
+                            billLine.Id = data.bill.BillLines[i].Id;
+                            billLine.CashRegCode = data.bill.BillLines[i].CashRegCode;
+                            billLine.ProductOrServiceName = data.bill.BillLines[i].ProductOrServiceName;
+                            billLine.SellPrice = data.bill.BillLines[i].SellPrice;
+                            billLine.Quantity = data.bill.BillLines[i].Quantity;
+                            bill.BillLines.push(billLine);
+                        }
+                        countSumm();
+                        showLineList();
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                },
+                error: onFail,
+                complete: function () { document.getElementById('promoSpinner').style.display = 'none' }
+                })
+            }
+        }
+        function createBill()
+        {
+            bill.BillNumber = document.getElementById('BillNumber').value;
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            var list = [];
+            for (var i = 0; i < bill.BillLines.length; i++)
+            {
+                var line = { Code: bill.BillLines[i].CashRegCode, Quantity: bill.BillLines[i].Quantity };
+                list.push(line);
+            }
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("BillsCreate", "OperationDays")",
+                data: {
+                    __RequestVerificationToken: token,
+                    BillNumber: bill.BillNumber,
+                    list,
+                    discount: bill.Promotion,
+                    BO: bill.BO
+                },
+                beforeSend: function () {
+                    document.getElementById('startSpinner').style.display = 'block'
+                },
+                success: function (data) {
+                    if (data.result === 'success') {
+                        $('#windowmodal').modal('hide');
+                        bills.push(data.bill);
+                        rebuildTableBills();
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                },
+                error: onFail,
+                complete: function () { document.getElementById('startSpinner').style.display = 'none' }
+            })
+        }
+
+
+
+        function onSuccessChooseCode(btn)
+        {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetLinePrice", "OperationDays")",
+                data: {
+                    codeId: btn.id.substring(6),
+                    discount: bill.Promotion
+                },
+                beforeSend: function () {
+                    document.getElementById('codeSpinner' + btn.id.substring(6)).style.display = 'block'
+                },
+                success: function (data) {
+                    if (data.result === 'success') {
+                        var billLine = {
+                            Id: 0,
+                            CashRegCode: 0,
+                            ProductOrServiceName: '',
+                            Quantity: 0,
+                            SellPrice: 0,
+                            Summ: 0
+                        };
+                        billLine.CashRegCode = data.data.CashRegCode;
+                        billLine.ProductOrServiceName = data.data.ProductOrServiceName;
+                        billLine.SellPrice = data.data.SellPrice;
+                        billLine.Quantity = 1;
+                        bill.BillLines.push(billLine);
+                        countSumm();
+                        showLineList();
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                },
+                error: onFail,
+                complete: function () { document.getElementById('codeSpinner' + btn.id.substring(6)).style.display = 'none' }
+            })
+        }
+        function rebuildTableCreate()
+        {
+            const formatter = new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+            document.getElementById('wholeSumm').innerHTML = formatter.format(bill.Summ);
+            var old_tbody = document.getElementById('tbodyLines');
+            var new_tbody = document.createElement('tbody');
+            new_tbody.id = 'tbodyLines';
+            for (var i = 0; i < bill.BillLines.length; i++)
+            {
+                var row = new_tbody.insertRow();
+                var cell = row.insertCell();
+                var text = document.createTextNode(i + 1);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                text = document.createTextNode(bill.BillLines[i].CashRegCode);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                text = document.createTextNode(bill.BillLines[i].ProductOrServiceName);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                text = document.createTextNode(bill.BillLines[i].SellPrice);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                var btn = document.createElement('button');
+                btn.value = i;
+                btn.onclick = function () { if (bill.BillLines[this.value].Quantity > 1) { bill.BillLines[this.value].Quantity = bill.BillLines[this.value].Quantity - 1; countSumm(); } };
+                btn.className = "btn btn-outline-danger";
+                text = document.createTextNode(' - ');
+                btn.appendChild(text);
+                cell.appendChild(btn);
+                cell = row.insertCell();
+                var inpt = document.createElement('input');
+                inpt.id = "inptQuan" + i;
+                inpt.className = "form-control col-sm";
+                inpt.value = bill.BillLines[i].Quantity;
+                inpt.onchange = function () { bill.BillLines[this.id.substring(8)].Quantity = this.value; countSumm(); };
+                cell.appendChild(inpt);
+                cell = row.insertCell();
+                btn = document.createElement('button');
+                btn.value = i;
+                btn.onclick = function () { bill.BillLines[this.value].Quantity = bill.BillLines[this.value].Quantity + 1; countSumm(); };
+                btn.className = "btn btn-outline-success";
+                text = document.createTextNode(' + ');
+                btn.appendChild(text);
+                cell.appendChild(btn);
+                cell = row.insertCell();
+                text = document.createTextNode(formatter.format(bill.BillLines[i].Summ));
+                cell.appendChild(text);
+                cell = row.insertCell();
+                btn = document.createElement('button');
+                btn.className = "btn btn-outline-danger";
+                btn.value = i;
+                btn.onclick = function () { bill.BillLines.splice(this.value,1); countSumm(); };
+                var ico = document.createElement('i');
+                ico.className = "fa fa-trash";
+                ico.setAttribute("aria-hidden", "true");
+                btn.appendChild(ico);
+                cell.appendChild(btn);
+            }
+            old_tbody.parentNode.replaceChild(new_tbody, old_tbody);
+
+        }
+
+        function rebuildTableBills() {
+            const formatter = new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+            var Summ = 0;
+            var old_tbody = document.getElementById('tbodyBills');
+            var new_tbody = document.createElement('tbody');
+            new_tbody.id = 'tbodyBills';
+            for (var i = 0; i < bills.length; i++) {
+                var row = new_tbody.insertRow();
+                row.id = 'trBill' + bills[i].Id;
+                row.value = i;
+                if (!bills[i].EndTime) {
+                    //row.className = 'bg-success';
+                    row.style = "background-color: #A7FD56"
+                }
+                var cell = row.insertCell();
+                var text = document.createTextNode(i + 1);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                var div = document.createElement('div');
+                div.className = "btn-group";
+                div.setAttribute('role', 'group');
+                var a = document.createElement('a');
+                a.className = "btn btn-outline-info";
+                a.title = "Info";
+                a.href = "@Url.Action("BillsInfo", "OperationDays")?Id=" + bills[i].Id;
+                a.setAttribute("data-ajax", "true");
+                a.setAttribute("data-ajax-method", "Get");
+                a.setAttribute("data-ajax-mode", "replace-with");
+                a.setAttribute("data-ajax-success", "showModal");
+                a.setAttribute("data-ajax-update", "#windowmodal");
+                var ico = document.createElement('i');
+                ico.className = "fas fa-info-circle";
+                ico.setAttribute("aria-hidden", "true");
+                a.appendChild(ico);
+                cell.appendChild(a);
+                cell = row.insertCell();
+                text = document.createTextNode(bills[i].BillNumber + ' ');
+                cell.appendChild(text);
+                a = document.createElement('a');
+                a.className = "btn btn-outline-warning";
+                a.title = "@GlobalRes.Edit @GlobalRes.BillShortName";
+                a.href = "@Url.Action("BillsEdit", "OperationDays")?id=" + bills[i].Id;
+                a.setAttribute("data-ajax", "true");
+                a.setAttribute("data-ajax-method", "Get");
+                a.setAttribute("data-ajax-mode", "replace-with");
+                a.setAttribute("data-ajax-success", "getEditData");
+                a.setAttribute("data-ajax-update", "#windowmodal");
+                ico = document.createElement('i');
+                ico.className = "fas fa-pen-alt";
+                ico.setAttribute("aria-hidden", "true");
+                a.appendChild(ico);
+                cell.appendChild(a);
+                cell = row.insertCell();
+                text = document.createTextNode(bills[i].ClientName);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                text = document.createTextNode(bills[i].StartTime);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                cell.id = 'tdEnd' + bills[i].Id;
+                text = document.createTextNode(bills[i].EndTime);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                text = document.createTextNode(bills[i].BO ? 'Да' : 'Нет');
+                cell.appendChild(text);
+                cell = row.insertCell();
+                text = document.createTextNode(bills[i].Summ);
+                cell.appendChild(text);
+                cell = row.insertCell();
+                if (!bills[i].EndTime) {
+                    var btn = document.createElement('button');
+                    btn.className = "btn btn-outline-dark";
+                    btn.title = "@GlobalRes.Close @GlobalRes.BillShortName";
+                    btn.value = i;
+                    btn.onclick = function () { if (confirm("@GlobalRes.Close @GlobalRes.BillShortName на " + bills[this.value].Summ + "     №" + bills[this.value].BillNumber + " ?")) { closeBill(bills[this.value].Id) } };
+                    var ico = document.createElement('i');
+                    ico.className = "fas fa-spinner fa-pulse";
+                    ico.setAttribute("aria-hidden", "true");
+                    ico.setAttribute("style", "display:none");
+                    ico.id = "CloseBillSpinner";
+                    btn.appendChild(ico);
+                    ico = document.createElement('i');
+                    ico.className = "far fa-calendar-check";
+                    ico.setAttribute("aria-hidden", "true");
+                    btn.appendChild(ico);
+                    cell.appendChild(btn);
+                }
+                else
+                {
+                    var btn = document.createElement('button');
+                    btn.className = "btn btn-outline-warning";
+                    btn.title = "Print";
+                    btn.value = i;
+                    btn.onclick = function () { printDialog(bills[this.value].Id)  };
+                    var span = document.createElement('span');
+                    span.className = "badge badge-dark";
+                    text = document.createTextNode(bills[i].PrintCount);
+                    span.appendChild(text);
+                    var ico = document.createElement('i');
+                    ico.className = "fas fa-spinner fa-pulse";
+                    ico.setAttribute("aria-hidden", "true");
+                    ico.setAttribute("style", "display:none");
+                    ico.id = "printSpinner";
+                    btn.appendChild(ico);
+                    text = document.createTextNode("Print ");
+                    btn.appendChild(text);
+                    btn.appendChild(span);
+                    cell.appendChild(btn);
+                }
+                Summ = bills[i].BO ? Summ : Summ + bills[i].Summ;
+            }
+            old_tbody.parentNode.replaceChild(new_tbody, old_tbody);
+            document.getElementById('daySumm').innerHTML = formatter.format(Summ);
+            $('[data-toggle="tooltip"]').tooltip();
+        }
+
+        function countSumm()
+        {
+
+            var Summ = 0;
+            for (var i = 0; i < bill.BillLines.length; i++)
+            {
+                bill.BillLines[i].Summ = bill.BillLines[i].SellPrice * bill.BillLines[i].Quantity;
+                Summ = Summ + bill.BillLines[i].Summ;
+            }
+            bill.Summ = Summ;
+            rebuildTableCreate();
+        }
+
+        function generateTable(table, data) {
+            for (let element of data) {
+                let row = table.insertRow();
+                for (key in element) {
+                    let cell = row.insertCell();
+                    let text = document.createTextNode(element[key]);
+                    cell.appendChild(text);
+                }
+            }
+        }
+        $("document").ready(function () {
+            getData();
+            $('[data-toggle="tooltip"]').tooltip();
+        })
+        function getData()
+        {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("BillsData", "OperationDays")",
+                success: function (data) {
+                    if (data.result === 'success') {
+                        bills = data.myBills;
+                        rebuildTableBills();
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                }
+            })
+        }
+        function getEditData()
+        {
+            if (document.getElementById('BillId'))
+                {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("BillsEditData", "OperationDays")?id=" + document.getElementById('BillId').value,
+                success: function (data) {
+                    if (data.result === 'success') {
+                        bill.id = data.bill.Id;
+                        bill.BillNumber = data.bill.BillNumber;
+                        bill.Promotion = data.bill.BillLines.length > 0 ? data.bill.BillLines[0].Promotion == 'Сотрудник' ? 'staff' : data.bill.BillLines[0].Promotion : data.bill.InitialPromo == 'Сотрудник' ? 'staff' : data.bill.InitialPromo;
+                        bill.BillLines = data.bill.BillLines;
+                        bill.BO = data.bill.BO;
+                        bill.version = data.bill.RowVersion;
+                        @*get clien data*@
+                        countSumm();
+                        $('#windowmodal').modal('show');
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                }
+                })
+            }
+            else
+            { $('#windowmodal').modal('show');}
+        }
+        function editBill()
+        {
+            bill.id = document.getElementById('BillId').value;
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            var list = [];
+            for (var i = 0; i < bill.BillLines.length; i++)
+            {
+                var line = { Id: bill.BillLines[i].Id, Code: bill.BillLines[i].CashRegCode, Quantity: bill.BillLines[i].Quantity };
+                list.push(line);
+            }
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("BillsEdit", "OperationDays")",
+                data: {
+                    __RequestVerificationToken: token,
+                    id: bill.id,
+                    list,
+                    discount: bill.Promotion,
+                    BO: bill.BO,
+                    version: bill.version
+                },
+                beforeSend: function () {
+                    document.getElementById('startSpinner').style.display = 'block'
+                },
+                success: function (data) {
+                    if (data.result === 'success') {
+                        $('#windowmodal').modal('hide');
+                        bills[document.getElementById('trBill' + data.bill.Id).value] = data.bill;
+                        rebuildTableBills();
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                },
+                error: onFail,
+                complete: function () { document.getElementById('startSpinner').style.display = 'none' }
+            })
+        }
+        function closeBill(Id) {
+            var form = $('#__AjaxAntiForgeryForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CloseBill", "OperationDays")",
+                data: {
+                    __RequestVerificationToken: token,
+                    Id:Id
+                },
+                beforeSend: function () {
+                    document.getElementById('CloseBillSpinner').style.display = 'block'
+                },
+                success: function (data) {
+                    if (data.result === 'success') {
+                        $('#windowmodal').modal('hide');
+                        bills[document.getElementById('trBill' + data.bill.Id).value] = data.bill;
+                        rebuildTableBills();
+                    }
+                    else {
+                        alert(data.message)
+                    }
+                },
+                error: onFail,
+                complete: function () { document.getElementById('CloseBillSpinner').style.display = 'none' }
+            })
+        }
+
+        function UnlockEdit()
+        {
+            if (confirm("Изменения не сохранятся. Закрыть редактор ?")) {
+                bill.id = document.getElementById('BillId').value;
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                $('#windowmodal').modal('hide');
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("FinishEdit", "OperationDays")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        Id: bill.id,
+                        version: bill.version
+                    }
+                })
+            }
+            
+        }
+        //$(function () {
+        //    $('[data-toggle="tooltip"]').tooltip();
+        //})
+        function UnlockComplete()
+        {
+            $('#windowmodal').modal('hide');
+        }
+
+        function signFail(request, error) {
+            alert('Действие не выполнено. ' + request.status + ' ' + request.statusText);
+        }
+        function signSuccess(data) {
+            if (data.result == 'success') {
+                var element = document.getElementById('buttonSign' + data.id);
+                element.parentNode.removeChild(element);
+            }
+            else {
+                alert('Действие не выполнено. ' + data.message);
+            }
+        }
+        function onFail(xhr) {
+            alert('Действие не выполнено. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status)
+        }
+        function printDialog(id) {
+            var span = document.createElement('span');
+            span.setAttribute("aria-hidden", "true");
+            span.innerHTML = '&times;';
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'close';
+            btn.setAttribute("data-dismiss", "modal");
+            btn.setAttribute("aria-label", "Close");
+            btn.appendChild(span);
+            var h5 = document.createElement('h5');
+            h5.className = 'modal-title';
+            h5.innerText = 'Сделайте выбор';
+            var div = document.createElement('div');
+            div.className = 'modal-header';
+            div.id = 'modalTop';
+            div.appendChild(h5);
+            div.appendChild(btn);
+            var divbody = document.createElement('div');
+            divbody.className = 'modal-body';
+            divbody.appendChild(div);
+            var btn = document.createElement('button');
+            btn.className = "btn btn-outline-success";
+            btn.title = "Авто печать";
+            btn.value = id;
+            btn.onclick = function () { autoPrint(this.value) };
+            var ico = document.createElement('i');
+            ico.className = "fas fa-spinner fa-pulse";
+            ico.setAttribute("aria-hidden", "true");
+            ico.setAttribute("style", "display:none");
+            ico.id = "PrintAutoSpinner";
+            btn.appendChild(ico);
+            var text = document.createTextNode(" Авто печать ");
+            btn.appendChild(text);
+            ico = document.createElement('i');
+            ico.className = "fas fa-print";
+            btn.appendChild(ico);
+            var divcol = document.createElement('div');
+            divcol.className = 'col';
+            divcol.appendChild(btn);
+            var divrow = document.createElement('div');
+            divrow.className = 'row';
+            divrow.appendChild(divcol);
+            divcol = document.createElement('div');
+            divcol.className = 'col';
+            divrow.appendChild(divcol);
+            btn = document.createElement('button');
+            btn.className = "btn btn-outline-danger";
+            btn.title = "Ручная печать";
+            btn.value = id;
+            btn.onclick = function () { manualPrint(this.value) };
+            ico = document.createElement('i');
+            ico.className = "fas fa-spinner fa-pulse";
+            ico.setAttribute("aria-hidden", "true");
+            ico.setAttribute("style", "display:none");
+            ico.id = "PrintManualSpinner";
+            btn.appendChild(ico);
+            text = document.createTextNode(" Ручная печать ");
+            btn.appendChild(text);
+            ico = document.createElement('i');
+            ico.className = "far fa-hand-paper";
+            btn.appendChild(ico);
+            divcol = document.createElement('div');
+            divcol.className = 'col';
+            divcol.appendChild(btn);
+            divrow.appendChild(divcol);
+            divbody.appendChild(divrow);
+            div = document.createElement('div');
+            div.className = 'modal-content';
+            div.appendChild(divbody);
+            div1 = document.createElement('div');
+            div1.className = 'modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm';
+            div1.role = "document";
+            div1.appendChild(div);
+            div = document.getElementById('windowmodal');
+            div.innerHTML = '';
+            div.className = "modal fade";
+            div.tabIndex = "-1";
+            div.role = "dialog";
+            div.setAttribute("data-backdrop", "static");
+            div.appendChild(div1);
+            $('#windowmodal').modal('show');
+        }
+        function autoPrint(id)
+        {
+            print(id, true);
+        }
+        function manualPrint(id)
+        {
+            print(id, false);
+        }
+        function print(id, auto)
+        {
+            var spinner = auto ? 'PrintAutoSpinner':'PrintManualSpinner';
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("AdditionalPrint", "OperationDays")",
+                data: {
+                    id: id,
+                    auto: auto
+                },
+                beforeSend: function () {
+                    document.getElementById(spinner).style.display = 'block'
+                },
+                success: function (data) {
+                    if (auto) {
+                        
+                        if (data.result === 'success') {
+                            bills[document.getElementById('trBill' + id).value].PrintCount = bills[document.getElementById('trBill' + id).value].PrintCount + 1;
+                            rebuildTableBills();
+                        }
+                        else {
+                            alert(data.message);
+                        }
+                    }
+                    else
+                    {
+                        bills[document.getElementById('trBill' + id).value].PrintCount = bills[document.getElementById('trBill' + id).value].PrintCount + 1;
+                        rebuildTableBills();
+                        var w = window.open('about:blank');
+                        w.document.open();
+                        w.document.write(data);
+                        w.document.close();
+                    }
+                },
+                error: onFail,
+                complete: function () { document.getElementById(spinner).style.display = 'none'; $('#windowmodal').modal('hide'); }
+            })
+        }
+
+    </script>
+}
+

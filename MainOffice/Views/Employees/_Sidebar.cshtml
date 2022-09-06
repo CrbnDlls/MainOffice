@@ -1,0 +1,175 @@
+﻿@model MainOffice.Models.EmployeeFilter
+@using MainOffice.App_LocalResources;
+@using MainOffice.Helpers
+@{
+    var metaData = ModelMetadataProviders
+    .Current
+    .GetMetadataForType(null, typeof(MainOffice.Models.Employee));
+    Dictionary<string, ModelMetadata> properties = metaData.Properties.ToDictionary(p => p.PropertyName);
+}    
+
+<div class="sidebar-header text-center">
+    <h6>@GlobalRes.FilterTitle</h6>
+</div>
+
+@using (Ajax.BeginForm("Filter", null, new AjaxOptions { OnSuccess = "onSuccessFilter" },new { @class = "needs-validation" }))
+{
+
+    <div class="sidebar-body">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					@Html.Label(properties["OldFamilyName"].DisplayName, new { @for = "OldFamilyName" })
+					@Html.ButtonsFor(model => model.OldFamilyNameButtons, new { htmlAttributes = new { @class = "form-control" } })
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								<div class="form-group">
+						@Html.Label(properties["ProfessionId"].DisplayName, new { @for = "ProfessionId" })
+						@Html.ListBoxFor(model => model.ProfessionIdSelected, (MultiSelectList)ViewBag.ProfessionsSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								<div class="form-group">
+						@Html.Label(properties["BarberLevelId"].DisplayName, new { @for = "BarberLevelId" })
+						@Html.ListBoxFor(model => model.BarberLevelIdSelected, (MultiSelectList)ViewBag.BarberLevelsSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								<div class="form-group">
+						@Html.Label(properties["SalonId"].DisplayName, new { @for = "SalonId" })
+						@Html.ListBoxFor(model => model.SalonIdSelected, (MultiSelectList)ViewBag.SalonsSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["HireDate"].DisplayName, new { @for = "HireDate" })
+					@Html.ButtonsFor(model => model.HireDateButtons, new { htmlAttributes = new { @class = "form-control" } })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.HireDateFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.HireDateFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.HireDateFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.HireDateTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.HireDateTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.HireDateTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["StaffNumber"].DisplayName, new { @for = "StaffNumber" })
+					@Html.ButtonsFor(model => model.StaffNumberButtons, new { htmlAttributes = new { @class = "form-control" } })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.StaffNumberFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.StaffNumberFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.StaffNumberFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.StaffNumberTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.StaffNumberTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.StaffNumberTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["PhoneNumber1"].DisplayName, new { @for = "PhoneNumber1" })
+					@Html.ButtonsFor(model => model.PhoneNumber1Buttons, new { htmlAttributes = new { @class = "form-control" } })
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["PhoneNumber2"].DisplayName, new { @for = "PhoneNumber2" })
+					@Html.ButtonsFor(model => model.PhoneNumber2Buttons, new { htmlAttributes = new { @class = "form-control" } })
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								<div class="form-group">
+						@Html.Label(properties["CompanyId"].DisplayName, new { @for = "CompanyId" })
+						@Html.ListBoxFor(model => model.CompanyIdSelected, (MultiSelectList)ViewBag.CompaniesSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["RegisterDate"].DisplayName, new { @for = "RegisterDate" })
+					@Html.ButtonsFor(model => model.RegisterDateButtons, new { htmlAttributes = new { @class = "form-control" } })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.RegisterDateFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.RegisterDateFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.RegisterDateFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.RegisterDateTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.RegisterDateTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.RegisterDateTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["DismissalDate"].DisplayName, new { @for = "DismissalDate" })
+					@Html.ButtonsFor(model => model.DismissalDateButtons, new { htmlAttributes = new { @class = "form-control" } })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.DismissalDateFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.DismissalDateFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.DismissalDateFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.DismissalDateTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.DismissalDateTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.DismissalDateTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+									@Html.Label(properties["BirthDay"].DisplayName, new { @for = "BirthDay" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.BirthDayFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.BirthDayFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.BirthDayFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.BirthDayTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.BirthDayTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.BirthDayTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+</div>
+    <div class="sidebar-footer">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+    </div>
+}

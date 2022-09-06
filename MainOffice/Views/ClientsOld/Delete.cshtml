@@ -1,0 +1,72 @@
+﻿@model MainOffice.Models.Client
+@using MainOffice.App_LocalResources
+
+@{
+    ViewBag.Title = GlobalRes.Delete;
+}
+
+<h2>@GlobalRes.Delete</h2>
+
+<div class="modal-header">
+    <h5 class="modal-title">@GlobalRes.DeleteConfirm</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<hr class="border-primary" />
+        <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FamilyName)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.FamilyName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FathersName)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.FathersName)
+        </dd>
+		</dl>
+    <hr class="border-primary" />        <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BirthDay)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BirthDay)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+		</dl>
+    <hr class="border-primary" />
+     @using (Ajax.BeginForm("Delete", null, new AjaxOptions { OnSuccess = "deleteRow" }, new { id = "DeleteForm" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="modal-footer">
+            <input type="submit" value="@GlobalRes.Delete" class="btn btn-outline-danger float-left" />
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+        </div>
+        
+    }

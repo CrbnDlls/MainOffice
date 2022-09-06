@@ -1,0 +1,287 @@
+﻿@{
+    ViewBag.Title = "Главное меню";
+}
+@if (Request.IsAuthenticated)
+{
+    <div class="container">
+        <div class="row mt-1 border border-info rounded">
+            <div class="col-4 pl-0">
+                <div class="list-group" id="list-tab" role="tablist">
+                    @if (User.IsInRole("admin"))
+                    {
+                        <a class="list-group-item list-group-item-action" id="list-users-list" data-toggle="list" href="#list-users" role="tab" aria-controls="users">Управление пользователями</a>
+                    }
+                    @if (User.IsInRole("admin") | User.IsInRole("director"))
+                    {
+                        <a class="list-group-item list-group-item-action" id="list-salons-list" data-toggle="list" href="#list-salons" role="tab" aria-controls="salons">Салоны и предприятия</a>
+                        <a class="list-group-item list-group-item-action" id="list-staff-list" data-toggle="list" href="#list-staff" role="tab" aria-controls="staff">Сотрудники</a>
+                        <a class="list-group-item list-group-item-action" id="list-pricelist-list" data-toggle="list" href="#list-pricelist" role="tab" aria-controls="pricelist">Прайс лист</a>
+                        <a class="list-group-item list-group-item-action" id="list-clients-list" data-toggle="list" href="#list-clients" role="tab" aria-controls="clients">Клиенты</a>
+                        <a class="list-group-item list-group-item-action" id="list-bills-list" data-toggle="list" href="#list-bills" role="tab" aria-controls="bills">Счета</a>
+                    }
+                    @if (User.IsInRole("admin") | User.IsInRole("director") | User.IsInRole("secretary"))
+                    {
+                        <a class="list-group-item list-group-item-action" id="list-billsold-list" data-toggle="list" href="#list-billsold" role="tab" aria-controls="billsold">Отчет по счетам старый</a>
+                    }
+                    @if (User.IsInRole("salonadmin"))
+                    {
+                        <a class="list-group-item list-group-item-action" id="list-operday-list" data-toggle="list" href="#list-operday" role="tab" aria-controls="operday">Работа салона</a>
+                    }
+                    @if (User.IsInRole("worksheets"))
+                    {
+                        <a class="list-group-item list-group-item-action" id="list-mybills-list" data-toggle="list" href="#list-mybills" role="tab" aria-controls="mybills">Счета</a>
+                    }
+                    @if (User.IsInRole("admin") | User.IsInRole("director") | User.IsInRole("owner"))
+                    {
+                        <a class="list-group-item list-group-item-action" id="list-control-list" data-toggle="list" href="#list-control" role="tab" aria-controls="control">Контроль</a>
+                    }
+                </div>
+            </div>
+            <div class="col-8">
+                <div class="tab-content" id="nav-tabContent">
+                    @if (User.IsInRole("admin"))
+                    {
+                        <div class="tab-pane fade" id="list-users" role="tabpanel" aria-labelledby="list-users-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Управление пользователями</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Регистрация", "Register", "Account", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Пользователи", "UserList", "Account", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Роли", "Index", "Role", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("admin") | User.IsInRole("director"))
+                    {
+                        <div class="tab-pane fade" id="list-salons" role="tabpanel" aria-labelledby="list-salons-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Данные салонов</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список салонов", "Index", "Salons", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список статусов салонов", "Index", "SalonStates", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список типов салонов", "Index", "SalonTypes", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список принтеров салонов", "Index", "SalonPrinters", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Данные предприятий</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список предприятий", "Index", "Companies", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="list-staff" role="tabpanel" aria-labelledby="list-staff-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Сотрудники</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список сотрудников", "Index", "Employees", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Отложенные обновления", "Index", "DelayedUpdateEmployees", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список званий парикмахеров", "Index", "BarberLevels", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список профессий", "Index", "Professions", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="list-pricelist" role="tabpanel" aria-labelledby="list-pricelist-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Продукция</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список продукции", "Index", "Products", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список торговых марок", "Index", "Trademarks", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список линий продуктов", "Index", "Productlines", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список объемов продуктов", "Index", "ProductVolumes", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Услуги</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список услуг", "Index", "Services", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список объемов услуг", "Index", "ServiceVolumes", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Прайс лист</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Цены и кода кассы", "Index", "CashRegCodes", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Отложенные обновления", "Index", "DelayedUpdateCashRegCodes", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Разделы прейскуранта", "Index", "PriceListUnits", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="list-clients" role="tabpanel" aria-labelledby="list-clients-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Клиенты</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список клиентов", "Index", "Clients", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="list-bills" role="tabpanel" aria-labelledby="list-bills-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Счета</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Список счетов", "Index", "Bills", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Архив операционных дней", "Index", "OperationDayArchives", null, new { @class = "text-dark" })
+                                        </li>
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Архив рабочих листов", "Index", "OperationDayEmployeeArchives", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("admin") | User.IsInRole("director") | User.IsInRole("secretary"))
+                    {
+                        <div class="tab-pane fade" id="list-billsold" role="tabpanel" aria-labelledby="list-billsold-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Счета</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Отчет по счетам", "Index", "CheckBills", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("salonadmin"))
+                    {
+                        <div class="tab-pane fade" id="list-operday" role="tabpanel" aria-labelledby="list-operday-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Операционный день</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Операционный день", "Index", "OperationDays", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("worksheets"))
+                    {
+                        <div class="tab-pane fade" id="list-mybills" role="tabpanel" aria-labelledby="list-mybills-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Счета</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Мои счета", "Index", "MyBills", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (User.IsInRole("admin") | User.IsInRole("director") | User.IsInRole("secretary"))
+                    {
+                        <div class="tab-pane fade" id="list-control" role="tabpanel" aria-labelledby="list-control-list">
+                            <div class="row">
+                                <div class="col-sm-4 mb-2" style="min-width:9rem;">
+                                    <h6 class="text-success">Контроль</h6>
+                                    <ul class="list-group no-bullets">
+                                        <li class="align-items-center">
+                                            @Html.ActionLink("Операционного дня", "Index", "OperDayStatistics", null, new { @class = "text-dark" })
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="jumbotron">
+        <h1>ASP.NET</h1>
+        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+        <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Getting started</h2>
+            <p>
+                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+                enables a clean separation of concerns and gives you full control over markup
+                for enjoyable, agile development.
+
+            </p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Get more libraries</h2>
+            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Web Hosting</h2>
+            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+        </div>
+    </div>
+}

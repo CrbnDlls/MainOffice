@@ -1,0 +1,26 @@
+﻿@model MainOffice.Models.NotFoundViewModel
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+@{
+    ViewBag.Title = Model.Title;
+    
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@Model.OriginalViewAction</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+    <hr class="border border-primary" />
+    <div class="alert alert-warning" role="alert">
+        @Model.Message
+    </div>
+   
+    <hr class="border border-primary" />
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+    </div>
+

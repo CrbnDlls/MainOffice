@@ -1,0 +1,82 @@
+﻿@model MainOffice.Models.OperDayBill
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+<div id="windowmodal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header lineList">
+                <div class="modal-title">
+                    <div class="btn-group btn-group-toggle mb-1" data-toggle="buttons">
+                        @if (Model.BillLines != null && Model.BillLines.Count > 0)
+                        {
+                            <label @(String.IsNullOrEmpty(Model.BillLines[0].Promotion) ? Html.Raw("class=\"btn btn-outline-info active\"") : Html.Raw("class=\"btn btn-outline-info\""))>
+                                <input type="radio" name="options" onchange="promotionChange(this)" id="option1" @(String.IsNullOrEmpty(Model.BillLines[0].Promotion) ? "checked" : "")><i class="fas fa-spinner fa-pulse" style="display:none" id="promoSpinner"></i> Без скидки
+                            </label>
+                            <label @(Model.BillLines[0].Promotion == "10%" ? Html.Raw("class=\"btn btn-outline-info active\"") : Html.Raw("class=\"btn btn-outline-info\""))>
+                                <input type="radio" name="options" onchange="promotionChange(this)" id="option2" @(Model.BillLines[0].Promotion == "10%" ? "checked" : "")> Скидка 10%
+                            </label>
+                            <label @(Model.BillLines[0].Promotion == "Сотрудник" ? Html.Raw("class=\"btn btn-outline-info active\"") : Html.Raw("class=\"btn btn-outline-info\""))>
+                                <input type="radio" name="options" onchange="promotionChange(this)" id="option3" @(Model.BillLines[0].Promotion == "Сотрудник" ? "checked" : "")> Сотрудник
+                            </label>
+                        }
+                        else
+                        {
+                            <label @(String.IsNullOrEmpty(Model.InitialPromo) ? Html.Raw("class=\"btn btn-outline-info active\"") : Html.Raw("class=\"btn btn-outline-info\""))>
+                                <input type="radio" name="options" onchange="promotionChange(this)" id="option1" @(String.IsNullOrEmpty(Model.InitialPromo) ? "checked" : "")><i class="fas fa-spinner fa-pulse" style="display:none" id="promoSpinner"></i> Без скидки
+                            </label>
+                            <label @(Model.InitialPromo == "10%" ? Html.Raw("class=\"btn btn-outline-info active\"") : Html.Raw("class=\"btn btn-outline-info\""))>
+                                <input type="radio" name="options" onchange="promotionChange(this)" id="option2" @(Model.InitialPromo == "10%" ? "checked" : "")> Скидка 10%
+                            </label>
+                            <label @(Model.InitialPromo == "Сотрудник" ? Html.Raw("class=\"btn btn-outline-info active\"") : Html.Raw("class=\"btn btn-outline-info\""))>
+                                <input type="radio" name="options" onchange="promotionChange(this)" id="option3" @(Model.InitialPromo == "Сотрудник" ? "checked" : "")> Сотрудник
+                            </label>
+                        }
+                    </div>
+                </div>
+                <button type="button" onclick="UnlockEdit()" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="lineList">
+                    <div class="row">
+                        <table class="table table-sm table-responsive" id="tableCreateBill">
+                            <thead>
+                                <tr>
+                                    <th scope="col" colspan="5">@Ajax.ActionLink(GlobalRes.CashRegCodeName + " - " + GlobalRes.Create, "PriceListUnits", "PriceList", new { identity = Model.OperationDayEmployee.EmployeeId }, new AjaxOptions { UpdateTargetId = "pricelist", InsertionMode = InsertionMode.Replace, OnBegin = "hideLineList", OnFailure = "onFail", LoadingElementId = "addCodeSpinner" }, new { @class = "btn btn-outline-success" })</th>
+                                    <th scope="col" colspan="1">№ @Html.DisplayFor(model => model.BillNumber)@Html.HiddenFor(model => model.Id, new { id = "BillId" })</th>
+                                    <th scope="col" colspan="1">@GlobalRes.Summ:</th>
+                                    <th scope="col" colspan="2" id="wholeSumm">0</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col" style="width: 3%">№</th>
+                                    <th scope="col" style="width: 4%">@Html.DisplayShortNameFor(model => model.BillLines[0].CashRegCode)</th>
+                                    <th scope="col" style="width: 39%">@Html.DisplayShortNameFor(model => model.BillLines[0].ProductOrServiceName)</th>
+                                    <th scope="col" style="width: 12%">@Html.DisplayShortNameFor(model => model.BillLines[0].SellPrice)</th>
+                                    <th scope="col">-</th>
+                                    <th scope="col" style="width: 25%">@Html.DisplayShortNameFor(model => model.BillLines[0].Quantity)</th>
+                                    <th scope="col">+</th>
+                                    <th scope="col" style="width: 12%">@GlobalRes.Summ</th>
+                                    <th scope="col" style="width: 5%"><i class="fas fa-tasks"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyLines"></tbody>
+                        </table>
+                        </div>
+                    <div class="modal-footer">
+                        <button onclick="editBill()" class="btn btn-outline-success"><i class="fas fa-spinner fa-pulse" style="display:none" id="startSpinner"></i>@GlobalRes.Save</button>
+                    </div>
+                </div>
+                    <div id="pricelistButtonClose" style="display: none">
+                        <button type="button" onclick="showLineList()" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <div id="pricelist" class="row"></div>
+                        <div class="spinner-grow text-warning mx-auto" role="status" id="addCodeSpinner" style="display:none;">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

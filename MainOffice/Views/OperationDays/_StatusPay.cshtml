@@ -1,0 +1,25 @@
+﻿@model MainOffice.Models.OperDayStatisticsViewModel
+<table class="table-sm">
+    <thead>
+        <tr class="text-info">
+            <th scope="col">@Html.DisplayNameFor(model => model.KasaSumm)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.TerminalSumm)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.DepositSumm)</th>
+            <th scope="col">@Html.DisplayNameFor(model => model.UnpaidSumm)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.KasaSumm)</td>
+            <td>@Html.DisplayFor(model => model.TerminalSumm)</td>
+            <td>@Html.DisplayFor(model => model.DepositSumm)</td>
+            <td>@Html.DisplayFor(model => model.UnpaidSumm)</td>
+        </tr>
+        <tr>
+            <td class="text-info">@GlobalRes.Total</td>
+            <td class="align-items-center" colspan="3">
+                @Html.DisplayFor(model => model.SummClosed)
+            </td>
+        </tr>
+    </tbody>
+</table>

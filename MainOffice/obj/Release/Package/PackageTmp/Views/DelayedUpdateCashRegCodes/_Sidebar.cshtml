@@ -1,0 +1,91 @@
+﻿@model MainOffice.Models.DelayedUpdateCashRegCodeFilter
+@using MainOffice.App_LocalResources;
+@using MainOffice.Helpers
+@{
+    var metaData = ModelMetadataProviders
+    .Current
+    .GetMetadataForType(null, typeof(MainOffice.Models.DelayedUpdateCashRegCode));
+    Dictionary<string, ModelMetadata> properties = metaData.Properties.ToDictionary(p => p.PropertyName);
+}    
+
+<div class="sidebar-header text-center">
+    <h6>@GlobalRes.FilterTitle</h6>
+</div>
+
+@using (Ajax.BeginForm("Filter", null, new AjaxOptions { OnSuccess = "onSuccessFilter" },new { @class = "needs-validation" }))
+{
+
+    <div class="sidebar-body">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					<div class="form-group">
+						@Html.Label(properties["PriceListUnit"].DisplayName, new { @for = "PriceListUnitId" })
+						@Html.ListBoxFor(model => model.PriceListUnitIdSelected, (MultiSelectList)ViewBag.PriceListUnitsSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["Price10"].DisplayName, new { @for = "Price10" })
+					@Html.ButtonsFor(model => model.Price10Buttons, new { htmlAttributes = new { @class = "form-control" } })
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["Price50"].DisplayName, new { @for = "Price50" })
+					@Html.ButtonsFor(model => model.Price50Buttons, new { htmlAttributes = new { @class = "form-control" } })
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["PriceStaff"].DisplayName, new { @for = "PriceStaff" })
+					@Html.ButtonsFor(model => model.PriceStaffButtons, new { htmlAttributes = new { @class = "form-control" } })
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								@Html.Label(properties["UpdateDate"].DisplayName, new { @for = "UpdateDate" })
+					@Html.ButtonsFor(model => model.UpdateDateButtons, new { htmlAttributes = new { @class = "form-control" } })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.UpdateDateFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.UpdateDateFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.UpdateDateFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.UpdateDateTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.UpdateDateTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.UpdateDateTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+									@Html.Label(properties["Price"].DisplayName, new { @for = "Price" })
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.PriceFrom)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.PriceFrom, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.PriceFrom, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<div class="form-group-sm form-row align-items-center">
+							<div class="col">
+								@Html.LabelFor(model => model.PriceTo)
+							</div>
+							<div class="col">
+							@Html.EditorFor(model => model.PriceTo, new { htmlAttributes = new { @class = "form-control-sm text-box single-line" } })
+							@Html.ValidationMessageFor(model => model.PriceTo, "", new { @class = "text-danger" })
+							</div>
+						</div>
+						<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+						<hr />
+</div>
+    <div class="sidebar-footer">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+    </div>
+}

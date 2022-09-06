@@ -1,0 +1,142 @@
+﻿<#@ template language="C#" HostSpecific="True" #>
+<#@ output extension=".cshtml" #>
+<#@ include file="Imports.include.t4" #>
+@model <#= ViewDataTypeName #>
+@using MainOffice.App_LocalResources
+<#
+// The following chained if-statement outputs the file header code and markup for a partial view, a view using a layout page, or a regular view.
+if(IsPartialView) {
+#>
+
+<#
+} else if(IsLayoutPageSelected) {
+#>
+
+@{
+    ViewBag.Title = GlobalRes.Delete;
+<#
+if (!String.IsNullOrEmpty(LayoutPageFile)) {
+#>
+    Layout = "<#= LayoutPageFile#>";
+<#
+}
+#>
+}
+
+<h2>@GlobalRes.Delete</h2>
+
+<#
+} else {
+#>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@GlobalRes.Delete</title>
+</head>
+<body>
+<#
+    PushIndent("    ");
+}
+#>
+<div class="modal-header">
+    <h5 class="modal-title">@GlobalRes.DeleteConfirm</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<hr class="border-primary" />
+<#
+int Count = 3;
+List<PropertyMetadata> foreignProperties = new List<PropertyMetadata> { };
+foreach (PropertyMetadata property in ModelMetadata.Properties) {
+    if (property.Scaffold && !property.IsPrimaryKey && !property.IsForeignKey && !property.IsConcurrencyProperty) {
+#>
+<#
+        // We do not want to show any association properties for which there is
+        // no associated foreign key.
+        if (property.IsAssociation && GetRelatedModelMetadata(property) == null) {
+            continue;
+        } 
+		
+		if (!property.IsAssociation)
+		{
+			if (Count % 3 == 0) {
+#>
+        <dl class="row">
+<#} #>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.<#= property.PropertyName #>)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.<#= GetValueExpression(property) #>)
+        </dd>
+<#		if (Count % 3 == 2) { #>
+		</dl>
+    <hr class="border-primary" /><#
+		 }
+	 Count++;
+		}
+		else
+		{
+			foreignProperties.Add(property);
+		}
+    }
+	 
+}
+
+foreach (PropertyMetadata property in foreignProperties) {
+    
+if (Count % 3 == 0) {
+#>
+        <dl class="row">
+<#} #>
+		<dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.<#= property.PropertyName #>)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.<#= GetValueExpression(property) #>)
+        </dd>
+		<#		if (Count % 3 == 2) { #>
+		</dl>
+    <hr class="border-primary" /><#
+		 }
+	 Count++;
+}
+if ((Count-1) % 3 != 2) { #>
+</dl>
+    <hr class="border-primary" />
+<# } #>
+
+     @using (Ajax.BeginForm("Delete", null, new AjaxOptions { OnSuccess = "deleteRow", UpdateTargetId = "modalform", LoadingElementId = "deleteLoading", OnFailure = "failSave" }, new { id = "DeleteForm" }))
+    {
+        @Html.AntiForgeryToken()
+		@Html.HiddenFor(model => model.Id);
+		@Html.HiddenFor(model => model.RowVersion);
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-outline-danger float-left"><i class="fas fa-spinner fa-pulse" style="display:none" id="deleteLoading"></i> @GlobalRes.Delete</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+        </div>
+        
+    }
+<#
+// The following code closes the tag used in the case of a view using a layout page and the body and html tags in the case of a regular view page
+#>
+<#
+if(!IsPartialView && !IsLayoutPageSelected) {
+    ClearIndent();
+#>
+</body>
+</html>
+<#
+}
+#>
+<#@ include file="ModelMetadataFunctions.cs.include.t4" #>

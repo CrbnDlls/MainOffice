@@ -1,0 +1,149 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@if (Request.IsAuthenticated)
+{
+    if (User.IsInRole("admin"))
+    {
+        <div class="list-group list-group-horizontal">
+            <div class="list-group menu">
+                <div class="menu-title">
+                    Управление пользователями
+                </div>
+                @Html.ActionLink("Регистрация", "Register", "Account", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Пользователи", "UserList", "Account", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Роли", "Index", "Role", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+        </div>
+    }
+    if (User.IsInRole("admin") | User.IsInRole("director"))
+    {
+        <div class="list-group list-group-horizontal">
+            <div class="list-group menu">
+                <div class="menu-title" style="color:red">
+                    Данные салонов
+                </div>
+                @Html.ActionLink("Список салонов", "Index", "Salons", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список статусов салонов", "Index", "SalonStates", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список типов салонов", "Index", "SalonTypes", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список принтеров салонов", "Index", "SalonPrinters", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+            <div class="list-group menu">
+                <div class="menu-title" style="color:orange">
+                    Данные предприятий
+                </div>
+                @Html.ActionLink("Список предприятий", "Index", "Companies", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+            <div class="list-group menu">
+                <div class="menu-title" style="color:yellow">
+                    Сотрудники
+                </div>
+                @Html.ActionLink("Список сотрудников", "Index", "Employees", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список званий парикмахеров", "Index", "BarberLevels", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список профессий", "Index", "Professions", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+            <div class="list-group menu">
+                <div class="menu-title" style="color:green">
+                    Продукция
+                </div>
+                @Html.ActionLink("Список продукции", "Index", "Products", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список торговых марок", "Index", "Trademarks", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список линий продуктов", "Index", "Productlines", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список объемов продуктов", "Index", "ProductVolumes", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+            <div class="list-group menu">
+                <div class="menu-title" style="color:skyblue">
+                    Услуги
+                </div>
+                @Html.ActionLink("Список услуг", "Index", "Services", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Список объемов услуг", "Index", "ServiceVolumes", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+            <div class="list-group menu">
+                <div class="menu-title" style="color:blue">
+                    Прайс лист
+                </div>
+                @Html.ActionLink("Цены и кода кассы", "Index", "CashRegCodes", null, new { @class = "list-group-item list-group-item-action" })
+                @Html.ActionLink("Разделы прейскуранта", "Index", "PriceListUnits", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+            <div class="list-group menu">
+                <div class="menu-title" style="color:purple">
+                    Клиенты
+                </div>
+                @Html.ActionLink("Список клиентов", "Index", "Clients", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+            <div class="list-group menu">
+                <div class="menu-title" style="color:red">
+                    Счета
+                </div>
+                @Html.ActionLink("Список счетов", "Index", "Bills", null, new { @class = "list-group-item list-group-item-action" })
+            </div>
+        </div>
+    }
+    if (User.IsInRole("admin") | User.IsInRole("director") | User.IsInRole("secretary"))
+    {
+        <div class="list-group list-group-horizontal">
+            <div class="list-group menu">
+                <div class="menu-title" style="color:violet">
+                    Отчет по счетам
+                </div>
+                @Html.ActionLink("Отчет по счетам", "Index", "CheckBills", null, new { @class = "list-group-item list-group-item-action" })
+
+            </div>
+        </div>
+    }
+    if (User.IsInRole("salonadmin"))
+    {
+        <div class="list-group list-group-horizontal">
+            <div class="list-group menu">
+                <div class="menu-title" style="color:forestgreen">
+                    Работа салона
+                </div>
+                @Html.ActionLink("Операционный день", "Index", "OperationDays", null, new { @class = "list-group-item list-group-item-action" })
+
+            </div>
+        </div>
+    }
+    if (User.IsInRole("worksheets"))
+    {
+        <div class="list-group list-group-horizontal">
+            <div class="list-group menu">
+                <div class="menu-title" style="color:chocolate">
+                    Счета
+                </div>
+                @Html.ActionLink("Мои счета", "Index", "MyBills", null, new { @class = "list-group-item list-group-item-action" })
+
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="jumbotron">
+        <h1>ASP.NET</h1>
+        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+        <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Getting started</h2>
+            <p>
+                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+                enables a clean separation of concerns and gives you full control over markup
+                for enjoyable, agile development.
+
+            </p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Get more libraries</h2>
+            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Web Hosting</h2>
+            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+        </div>
+    </div>
+}

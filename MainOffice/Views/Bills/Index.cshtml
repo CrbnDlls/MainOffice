@@ -1,0 +1,690 @@
+﻿@model IEnumerable<MainOffice.Models.Bill>
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+@{
+    MainOffice.Models.BillFilter filter = ViewBag.Filter as MainOffice.Models.BillFilter;
+    ViewBag.Title = Html.DisplayCustomForModel("GroupName");
+    string serverSide = "data-side-pagination=server";
+    string sidebarHeight = ViewBag.TableHeight + "px";
+}
+
+<div class="wrapper">
+    <nav id="sidebar" style="max-height:@sidebarHeight;overflow-y: scroll;">@Html.Partial("_Sidebar", ViewBag.Filter as MainOffice.Models.BillFilter)</nav>
+    <div class="container-fluid body-content">
+        <div id="content">
+            <div class="toolbar">
+                <button type="button" id="sidebarCollapse" class="btn btn-outline-info">
+                    <i class="fas fa-align-left"></i>
+                    <span>@GlobalRes.TableFilters</span>
+                </button>
+                @Ajax.ActionLink(Html.DisplayCustomForModel("Name") + " - " + GlobalRes.Create, "Create", null, new AjaxOptions { UpdateTargetId = "modalform", LoadingElementId = "modalPreloader", OnFailure = "failedModal" }, new { @class = "btn btn-outline-success", data_toggle = "modal", data_target = "#windowmodal" })
+            </div>
+            <table id="tablegrid"
+                   data-search="true"
+                   data-show-columns="true"
+                   data-show-columns-toggle-all="true"
+                   data-minimum-count-columns="2"
+                   data-show-export="true"
+                   data-locale="@GlobalRes.CurrentCulture"
+                   data-height="@ViewBag.TableHeight"
+                   data-sortable="true"
+                   data-pagination="true"
+                   data-page-list="[50, 70, 100, 400, All]"
+                   data-page-size="400"
+                   data-show-footer="true"
+                   data-detail-view="true"
+                   data-method="post"
+                   data-unique-id="id"
+                   data-click-to-select="true"
+                   data-ignore-click-to-select-on="ignoreClickToSelectOn"
+                   data-detail-formatter="detailFormatter"
+                   data-toolbar=".toolbar"
+                   @if ((bool)ViewBag.ServerSide) { @serverSide ; }
+                   data-query-params="queryParams"
+                   data-custom-sort="customSort"
+                   data-url="../Bills/data"
+                   data-response-handler="responseHandler">
+                <thead>
+                    <tr>
+                        
+                        <th title="@GlobalRes.Index" data-field="index" rowspan="2" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalTextFormatter" data-formatter="runningFormatter">
+                            @GlobalRes.IndexShort
+                        </th>
+
+                        <th title="@Html.DisplayCustomForModel("GroupName")" colspan="10" data-valign="middle" data-halign="center" data-align="center">
+                            @(Html.DisplayCustomForModel("GroupName") + ": " + (filter.IssueDateFrom.HasValue ? filter.IssueDateFrom.Value.ToString("yyyy-MM-dd") : "") + " - " + (filter.IssueDateTo.HasValue ? filter.IssueDateTo.Value.ToString("yyyy-MM-dd") : ""))
+                        </th>
+                        <th data-field="operate" rowspan="2" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-formatter="operateFormatter">@GlobalRes.Actions</th>
+                    </tr>
+                    <tr>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.BillNumber)" data-field="BillNumber" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.BillNumber)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.IssueDate)" data-field="IssueDate" data-type-name="Date" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.IssueDate)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.StartTime)" data-field="StartTime" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.StartTime)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.EndTime)" data-field="EndTime" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.EndTime)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.BO)" data-field="BO" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.BO)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.PrintCount)" data-field="PrintCount" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.PrintCount)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.Client)" data-field="Client.Name" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.Client)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.Employee)" data-field="Employee.Name" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.Employee)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.Salon.Name)" data-field="Salon.Name" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.Salon.Name)
+                        </th>
+                        <th data-title-tooltip="@GlobalRes.Summ" data-field="Summ" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-formatter="priceFormatter" data-footer-formatter="totalPriceFormatter">
+                            @GlobalRes.Summ
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <div id="windowmodal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl" role="document">
+                    <div class="modal-content">
+                        <img src="~/Images/preloader.gif" alt="Loading..." id="modalPreloader" style="display:none;width:128px;height:128px;align-self:center" />
+                        <div class="modal-body" id="modalform">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+@section scripts
+{
+    @{
+        var locale = GlobalRes.CurrentCulture;
+        var path = "/Scripts/i18n/defaults-" + locale.Replace("-", "_") + ".min.js";
+        <script src="@path"></script>
+    }
+    <script type="text/javascript">
+
+    var $table = $('#tablegrid')
+    var $remove = $('#remove')
+	    var selections = []
+    var filter = '@Html.Raw(Json.Encode(ViewBag.Filter))'
+
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            return row.id
+        })
+    }
+
+    function responseHandler(res) {
+        $.each(res.rows, function (i, row) {
+            row.state = $.inArray(row.id, selections) !== -1
+        })
+        return res
+    }
+    function queryParams(params) {
+        params.datafilter = filter;
+        return params
+    }
+
+    const formatter = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })
+    function priceFormatter(value) {
+        return formatter.format(value)
+    }
+    function detailFormatter(index, row) {
+        var html = []
+        html.push('<table>')
+        html.push('<thead>')
+        html.push('<tr align="center" valign="middle">')
+        html.push('<th title="Дата и время внесения">Дата и время внесения</th>')
+        html.push('<th title="Код кассы">Код кассы</th>')
+        html.push('<th title="Наименование услуги/товара">Наименование услуги/товара</th>')
+        html.push('<th title="Кол-во">Кол-во</th>')
+        html.push('<th title="Скидка">Скидка</th>')
+        html.push('<th title="Цена продажи">Цена продажи</th>')
+        html.push('<th title="@GlobalRes.Summ">@GlobalRes.Summ</th>')
+        html.push('<th title="Дата и время отмены">Дата и время отмены</th>')
+        html.push('<th title="Виза">Виза</th>')
+        html.push('</tr>')
+        html.push('</thead>')
+        for (var i = 0; i < row.BillLines.length; i++)
+        {
+            
+            html.push((row.BillLines[i].Cancel ? '<tr class="bg-danger">' : '<tr>'))
+            html.push('<td>' + row.BillLines[i].InsertDateTime + '</td>')
+            html.push('<td>' + row.BillLines[i].CashRegCode + '</td>')
+            html.push('<td>' + row.BillLines[i].ProductOrServiceName + '</td>')
+            html.push('<td>' + row.BillLines[i].Quantity + '</td>')
+            html.push('<td>' + (row.BillLines[i].Promotion == null ? '' : row.BillLines[i].Promotion) + '</td>')
+            html.push('<td>' + row.BillLines[i].SellPrice + '</td>')
+            html.push('<td>' + row.BillLines[i].Summ + '</td>')
+            html.push('<td>' + (row.BillLines[i].CancelDateTime ? row.BillLines[i].CancelDateTime : '') + '</td>')
+            html.push('<td>' + (row.BillLines[i].AdminVisa ? row.BillLines[i].AdminVisa.Name : '') + '</td>')
+            html.push('</tr>')
+        }
+        html.push('</table>')
+    return html.join('')
+    }
+
+    function customSort(sortName, sortOrder, data)
+    {
+        var order = sortOrder === 'desc' ? -1 : 1;
+        var tableOptions = $table.bootstrapTable('getOptions');
+        var dataType = undefined;
+        for (var i = 0; i < tableOptions.columns[1].length; i++)
+        {
+            if (tableOptions.columns[1][i].field == sortName)
+            {
+                dataType = tableOptions.columns[1][i].typeName;
+            }
+        }
+        data.sort(function (a, b) {
+            var aa = getItemField(a, sortName, tableOptions.escape);
+            var bb = getItemField(b, sortName, tableOptions.escape);
+            return sort(aa, bb, order, tableOptions.sortStable, dataType);
+        })
+    }
+    function sort(a, b, order, sortStable, dataType) {
+        if (a === undefined || a === null) {
+            a = '';
+        }
+
+        if (b === undefined || b === null) {
+            b = '';
+        }
+
+        if (sortStable && a === b) {
+            a = a._position;
+            b = b._position;
+        } // If both values are numeric, do a numeric comparison
+
+
+        if (this.isNumeric(a) && this.isNumeric(b)) {
+            // Convert numerical values form string to float.
+            a = parseFloat(a);
+            b = parseFloat(b);
+
+            if (a < b) {
+                return order * -1;
+            }
+
+            if (a > b) {
+                return order;
+            }
+
+            return 0;
+        }
+
+        if (a === b) {
+            return 0;
+        } // If value is not a string, convert to string
+
+        if (dataType === 'Date')
+        {
+            var aa = new Date(fromLocalDate(a));
+            var bb = new Date(fromLocalDate(b));
+
+            if (aa < bb) {
+                return order * -1;
+            }
+
+            if (aa > bb) {
+                return order;
+            }
+            return 0;
+        }
+        if (typeof a !== 'string') {
+            a = a.toString();
+        }
+
+        if (a.localeCompare(b) === -1) {
+            return order * -1;
+        }
+
+        return order;
+    }
+    function fromLocalDate(date)
+    {
+        if (date == '')
+        {
+            return '0000-01-01'
+        }
+        var sampleDate = new Date('1976-08-02');
+        var sampleString = sampleDate.toLocaleDateString()
+        var startY = sampleString.indexOf(1);
+        var endY = sampleString.indexOf(6);
+        var m = sampleString.indexOf(8);
+        var d = sampleString.indexOf(2);
+        var year = date.substring(startY, endY + 1);
+        var month = undefined;
+        var day = undefined;
+        if (date.substring(m - 1, m + 1).length == 1) {
+            month = '0' + date.substring(m - 1, m + 1);
+        }
+        else {
+            if (Number.isInteger(parseInt(date.substring(m - 1, m + 1)))) {
+                month = date.substring(m - 1, m + 1);
+            }
+            else {
+                month = '0' + date.substring(m, m + 1);
+            }
+
+        }
+        if (date.substring(d - 1, d + 1).length == 1) {
+            day = '0' + date.substring(d - 1, d + 1);
+        }
+        else {
+            if (Number.isInteger(parseInt(date.substring(d - 1, d + 1)))) {
+                day = date.substring(d - 1, d + 1);
+            }
+            else {
+                day = '0' + date.substring(d, d + 1);
+            }
+
+        }
+        return year + '-' + month + '-' + day
+    }
+    function isNumeric(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+    function getItemField(item, field, escape) {
+        var value = item;
+
+        if (typeof field !== 'string' || item.hasOwnProperty(field)) {
+            return escape ? this.escapeHTML(item[field]) : item[field];
+        }
+
+        var props = field.split('.');
+        var _iteratorNormalCompletion7 = true;
+        var _didIteratorError7 = false;
+        var _iteratorError7 = undefined;
+
+        try {
+            for (var _iterator7 = props[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                var p = _step7.value;
+                value = value && value[p];
+            }
+        } catch (err) {
+            _didIteratorError7 = true;
+            _iteratorError7 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                    _iterator7.return();
+                }
+            } finally {
+                if (_didIteratorError7) {
+                    throw _iteratorError7;
+                }
+            }
+        }
+
+        return escape ? this.escapeHTML(value) : value;
+    }
+        function operateFormatter(value, row, index) {
+            return [
+            '<div class="btn-group" aria-label="Toolbar with button groups">',
+            '<a class="btn btn-outline-warning" title="@GlobalRes.Edit" data-ajax="true" data-ajax-failure="failedModal" data-ajax-loading="#modalPreloader" data-ajax-mode="replace" data-ajax-update="#modalform" data-ajax-success="onEditOpen" data-target="#windowmodal" data-toggle="modal" href="/Bills/Edit/' + row.id + '" style="margin-right:10px">',
+            '<i class="fas fa-pen-alt" aria-hidden="true"></i>',
+            '</a>',
+            '</div>'
+        ].join('')
+    }
+
+
+    function totalTextFormatter(data) {         return '@GlobalRes.Total'
+    }
+
+    function totalNameFormatter(data) {
+        return data.length
+    }
+
+    function totalPriceFormatter(data) {
+        var field = this.field
+        return formatter.format(data.map(function (row) {
+            return +row[field]
+        }).reduce(function (sum, i) {
+            return sum + i
+        }, 0))
+    }
+    function runningFormatter(value, row, index) {
+
+        var tableOptions = $table.bootstrapTable('getOptions');
+        var result = index + 1
+        if (tableOptions.sidePagination == 'server' & typeof (tableOptions.pageSize) === 'number') {
+            result = ((tableOptions.pageNumber - 1) * tableOptions.pageSize) + (1 + index);
+        }
+        return result
+    }
+	function failSave(xhr) { alert('Не удалось выполнить действие. Статус: ' + xhr.status + ', Текст статуса: ' + xhr.statusText) }
+	function failedModal(xhr) {
+        alert('Status: ' + xhr.status + ', Status Text: ' + xhr.statusText);
+        var span = document.createElement('span');
+        span.setAttribute("aria-hidden", "true");
+        span.innerHTML = '&times;';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'close';
+        btn.setAttribute("data-dismiss", "modal");
+        btn.setAttribute("aria-label", "Close");
+        btn.appendChild(span);
+        var h5 = document.createElement('h5');
+        h5.className = 'modal-title';
+        h5.innerText = 'Ошибка. Статус: ' + xhr.status + ', Текст статуса: ' + xhr.statusText;
+        var div = document.createElement('div');
+        div.className = 'modal-header';
+        div.id = 'modalTop';
+        div.appendChild(h5);
+        div.appendChild(btn);
+        document.getElementById('modalform').appendChild(div);
+    }
+    function onFail(xhr) {
+        alert('Действие не выполнено. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status)
+    }
+    function onSuccessFilter(data)
+    {
+        if (data.result == 'notValid') {
+            showvalidationmessages(data.ModelState)
+        }
+
+        if (data.result == 'success') {
+            filter = data.dataFilter;
+            var tableTitle = $table.find('thead > tr > th > div.th-inner').get();
+            tableTitle[1].innerText = '@Html.DisplayCustomForModel("GroupName"): ' + document.getElementById('IssueDateFrom').value + ' - ' + document.getElementById('IssueDateTo').value;
+            setFilters(data);
+        }
+    }
+    function onSuccessEdit(data) {
+        if (data.result == 'success') {
+            updateRow(data.data);
+            $('#windowmodal').modal('hide');
+        }
+        else
+        {
+            document.getElementById('EditForm').setAttribute('was-validated', '');
+			document.getElementById('modalTop').scrollIntoView();
+        }
+    }
+    function onSuccessCreate(data) {
+        if (data.result == 'success') {
+            $table.bootstrapTable('insertRow', { index: 0, row: data.data })
+            $('#windowmodal').modal('hide');
+        }
+        else {
+            document.getElementById('CreateForm').setAttribute('was-validated', '');
+			document.getElementById('modalTop').scrollIntoView();
+        }
+    }
+    function updateRow(data) {
+        $table.bootstrapTable('updateByUniqueId', {
+            id: data.id,
+            row: data,
+            replace: true
+        })
+    }
+    function deleteRow(data) {
+        if (data.result === 'success') {
+            $table.bootstrapTable('removeByUniqueId', data.value);
+            $('#windowmodal').modal('hide');
+        }
+        else if (data.result === 'fail')
+        {
+            $('#windowmodal').modal('hide');
+            alert(data.message);
+        }
+    }
+
+	function refreshRow(id) {
+        $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("RefreshRow","Bills")",
+                    data: {
+                        id
+                    },
+                    success: function (data) {
+                        if (data.result === 'edit')
+                        {
+                            updateRow(data.data);
+                        }
+                        else if (data.result === 'delete')
+                        {
+                            $table.bootstrapTable('removeByUniqueId', id);
+                        }
+                    },
+					error: function (xhr) { alert('Не удалось обновить строку. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status) }
+                })
+    }
+
+    function onEditOpen() {
+        if (Modernizr.es5date) {
+            // supported
+            var inputs = document.querySelectorAll("input[type=date]");
+            for (var index = 0; index < inputs.length; index++) {
+                if (inputs[index].defaultValue != undefined || inputs[index].defaultValue != '')
+                    inputs[index].value = fromLocalDate(inputs[index].defaultValue);
+            }
+
+        } else {
+            // not-supported
+        }
+    }
+
+    function setFilters(data)
+    {
+
+        $('#sidebar').toggleClass('active');
+        $('.navbar').toggleClass('moveright');
+
+        setTimeout(function () {
+            if (data.ServerSide == true) {
+                $table.bootstrapTable('refreshOptions', {
+                    sidePagination: 'server'
+                })
+                $table.bootstrapTable('refresh');
+           }
+            else {
+                $table.bootstrapTable('refreshOptions', {
+                    sidePagination: 'client'
+                })
+                $table.bootstrapTable('refresh');
+                }
+        }, 100);
+
+
+    }
+    function telInput(sender) {
+        if (sender.value.length == 10 & !isNaN(sender.value)) {
+            sender.value = '(' + sender.value.substring(0, 3) + ') ' + sender.value.substring(3, 6) + '-' + sender.value.substring(6, 8) + '-' + sender.value.substring(8, 10);
+        }
+    }
+function ignoreClickToSelectOn(e) {
+        return ['A', 'BUTTON', 'LABEL', 'INPUT', 'I'].indexOf(e.tagName) > -1
+    }
+ $("document").ready(function () {
+
+     $table.bootstrapTable();
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar').toggleClass('active');
+            $('.navbar').toggleClass('moveright');
+
+            $('.filter-select').selectpicker();
+        });
+        $("document").on('resize', function () {
+            $('#tablegrid').bootstrapTable('resetView');
+        });
+        $table.on('check.bs.table uncheck.bs.table ' +
+            'check-all.bs.table uncheck-all.bs.table',
+            function () {
+                if (!$table.bootstrapTable('getSelections').length)
+                {
+                    $remove.prop('disabled', true)
+                    $remove.prop('class', 'btn btn-danger')
+					                }
+                else
+                 {
+                    $remove.prop('disabled', false)
+                    $remove.prop('class', 'btn btn-outline-danger')
+
+                }
+                // save your data, here just save the current page
+                selections = getIdSelections()
+                // push or splice the selections if you want to save all data selections
+            })
+        $table.on('all.bs.table', function (e, name, args) {
+            console.log(name, args)
+        })
+		$('#windowmodal').on('hidden.bs.modal', function (e) {
+            document.getElementById('modalform').innerHTML = '';
+        })
+        $remove.click(function () {
+            var ids = getIdSelections()
+            if (confirm("@GlobalRes.DeleteConfirm\n" + ids.length + "@GlobalRes.Rows"))
+            {
+                var form = $('#__AjaxAntiForgeryForm');
+                var token = $('input[name="__RequestVerificationToken"]', form).val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("DeleteList","Bills")",
+                    data: {
+                        __RequestVerificationToken: token,
+                        ids: ids
+                    },
+					beforeSend: function () {
+                        document.getElementById('removeLoading').style.display = 'block'},
+                    success: function (data) {
+                        if (data.result === 'success')
+                        {
+                            $remove.prop('disabled', true)
+                            $remove.prop('class', 'btn btn-danger')
+							                            $table.bootstrapTable('remove', {
+                                field: 'id',
+                                values: ids
+                            })
+                        }
+                        else
+                        {
+                            alert(data.message)
+                        }
+                    },
+                    error: function (xhr) { alert('Не удалось удалить строки. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status) },
+                    complete: function () { document.getElementById('removeLoading').style.display = 'none' }
+                })
+
+            }
+
+        })
+				@if (ViewBag.Edit != 0)
+        {
+            <text>
+
+                $.ajax({
+                type: "GET",
+                url: "@Url.Action("Edit", "Bills")/@ViewBag.Edit",
+                success: function (data) {
+                    $('#modalform').html(data);
+                    onEditOpen();
+                    $('#windowmodal').modal('show');
+
+                },
+                error: function (xhr) { alert('Не удалось открыть новое окно редактора. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status) }
+            })
+            </text>
+        }
+})
+	 function getProp(obj, prop) {
+				if (typeof obj !== 'object') throw 'getProp: obj is not an object';
+				if (typeof prop !== 'string') throw 'getProp: prop is not a string';
+
+				// Replace [] notation with dot notation
+				prop = prop.replace(/\[["'`](.*)["'`]\]/g, ".$1");
+
+				return prop.split('.').reduce(function (prev, curr) {
+					return prev ? prev[curr] : undefined
+				}, obj || self)
+			}
+
+    function showvalidationmessages(modelstate)
+    {
+
+    }
+function addBillLine() {
+
+        var my_elem = document.getElementById('buttonAddBillLine');
+
+        var div = document.createElement('div');
+        billLineNumber = billLineNumber + 1;
+        div.id = 'billdivline' + billLineNumber;
+        div.innerHTML = ['<div class="form-group col-md-2">',
+            '<input type="text" name="BillLines[' + billLineNumber + '].CashRegCode" class="form-control text-box single-line" />',
+            '<div class="invalid-feedback">',
+            '</div>',
+            '</div>',
+            '<div class="form-group col-md-3">',
+            '<input type="text" name="BillLines[' + billLineNumber + '].ProductOrServiceName" list="serviceList" class="form-control text-box single-line" />',
+            '<div class="invalid-feedback">',
+            '</div>',
+            '</div>',
+            '<div class="form-group col-md-2">',
+            '<input type="text" name="BillLines[' + billLineNumber + '].Quantity" class="form-control text-box single-line" />',
+            '<div class="invalid-feedback">',
+            '</div>',
+            '</div>',
+            '<div class="form-group col-md-2">',
+            '<input type="text" name="BillLines[' + billLineNumber + '].Promotion" list="promotionList" class="form-control text-box single-line" />',
+            '<div class="invalid-feedback">',
+            '</div>',
+            '</div>',
+            '<div class="form-group col-md-2">',
+            '<input type="text" name="BillLines[' + billLineNumber + '].SellPrice" class="form-control text-box single-line" />',
+            '<div class="invalid-feedback">',
+            '</div>',
+            '</div>'].join('');
+        div.className = 'form-row';
+
+        my_elem.parentNode.insertBefore(div, my_elem);
+
+    }
+    function removeBillLine() {
+        if (billLineNumber != stopNumber) {
+            var element = document.getElementById('billdivline' + billLineNumber);
+            element.parentNode.removeChild(element);
+            billLineNumber = billLineNumber - 1;
+        }
+    }
+    function cellStyle(value, row, index, field) {
+        if (row.Corrections) {
+                return {
+                    classes: 'bg-danger'
+                }
+        }
+        if (row.BO == true) {
+                return {
+                    classes: 'bg-warning'
+                }
+            }
+            return {
+                css: {
+                    color: 'black'
+                }
+            }
+        }
+    function boolFormatter(value, row)
+    {
+        return value ? '@GlobalRes.Yes' : '@GlobalRes.No';
+    }
+    </script>
+}

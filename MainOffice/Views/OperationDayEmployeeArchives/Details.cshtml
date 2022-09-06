@@ -1,0 +1,68 @@
+﻿@model MainOffice.Models.OperationDayEmployeeArchive
+
+@{
+    ViewBag.Title = "Подробности";
+}
+
+<h2>Подробности</h2>
+
+<div>
+    <h4>@ViewData.ModelMetadata.AdditionalValues["ShortName"]</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.StartPoint)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StartPoint)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EndPoint)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EndPoint)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RowVersion)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RowVersion)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.Employee)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Employee.FamilyName)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.EndEmployee)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EndEmployee.FamilyName)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.OperationDayArchive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.OperationDayArchive.OpenGeoLocation)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.StartEmployee)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StartEmployee.FamilyName)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Вернуться к списку", "Index")
+</p>

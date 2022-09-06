@@ -1,0 +1,2 @@
+sqlcmd -Q "exec dbo.DelayedUpdateCashRegCode_proc" -S .\SQLEXPRESS -d MainOffice -o d:\yourOutput.txt
+sqlcmd -Q "exec dbo.DelayedUpdateEmployees_proc" -S .\SQLEXPRESS -d MainOffice -o d:\yourOutput.txt

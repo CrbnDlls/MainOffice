@@ -1,0 +1,48 @@
+﻿@model MainOffice.Models.ProductFilter
+@using MainOffice.App_LocalResources;
+@using MainOffice.Helpers
+@{
+    var metaData = ModelMetadataProviders
+    .Current
+    .GetMetadataForType(null, typeof(MainOffice.Models.Product));
+    Dictionary<string, ModelMetadata> properties = metaData.Properties.ToDictionary(p => p.PropertyName);
+}    
+
+<div class="sidebar-header text-center">
+    <h6>@GlobalRes.FilterTitle</h6>
+</div>
+
+@using (Ajax.BeginForm("Filter", null, new AjaxOptions { OnSuccess = "onSuccessFilter" },new { @class = "needs-validation" }))
+{
+
+    <div class="sidebar-body">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+					<div class="form-group">
+						@Html.Label(properties["Trademark"].DisplayName, new { @for = "TrademarkId" })
+						@Html.ListBoxFor(model => model.TrademarkIdSelected, (MultiSelectList)ViewBag.TrademarksSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								<div class="form-group">
+						@Html.Label(properties["Productline"].DisplayName, new { @for = "ProductlineId" })
+						@Html.ListBoxFor(model => model.ProductlineIdSelected, (MultiSelectList)ViewBag.ProductlinesSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+								<div class="form-group">
+						@Html.Label(properties["ProductVolume"].DisplayName, new { @for = "ProductVolumeId" })
+						@Html.ListBoxFor(model => model.ProductVolumeIdSelected, (MultiSelectList)ViewBag.ProductVolumesSelectList, new { @class = "filter-select", data_actions_box = "true", multiple = "", data_dropdown_align_right = "true" })
+					</div>
+					<small class="form-text text-muted">@GlobalRes.FilterPrompt</small>
+					<hr />
+			</div>
+    <div class="sidebar-footer">
+        <div class="btn-group btn-group-toggle btn-group-sm special">
+            <input type="submit" value="@GlobalRes.Apply" class="btn btn-success" />
+        </div>
+    </div>
+}

@@ -1,0 +1,45 @@
+﻿@model MainOffice.Models.Service
+@using MainOffice.App_LocalResources
+
+@{
+    ViewBag.Title = GlobalRes.Delete;
+}
+
+<h2>@GlobalRes.Delete</h2>
+
+<div class="modal-header">
+    <h5 class="modal-title">@GlobalRes.DeleteConfirm</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<hr class="border-primary" />
+        <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+		<dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ServiceVolume)
+        </dt>
+
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ServiceVolume.Name)
+        </dd>
+		</dl>
+    <hr class="border-primary" />
+
+     @using (Ajax.BeginForm("Delete", null, new AjaxOptions { OnSuccess = "deleteRow", UpdateTargetId = "modalform", LoadingElementId = "deleteLoading", OnFailure = "failSave" }, new { id = "DeleteForm" }))
+    {
+        @Html.AntiForgeryToken()
+		@Html.HiddenFor(model => model.Id);
+		@Html.HiddenFor(model => model.RowVersion);
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-outline-danger float-left"><i class="fas fa-spinner fa-pulse" style="display:none" id="deleteLoading"></i> @GlobalRes.Delete</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+        </div>
+        
+    }

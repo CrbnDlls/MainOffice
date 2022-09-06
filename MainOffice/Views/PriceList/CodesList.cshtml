@@ -1,0 +1,12 @@
+﻿@model MainOffice.Models.PriceListSelectViewModel
+@using MainOffice.Helpers
+<div class="col-sm-3 py-1" style="min-width:11rem">
+    @Ajax.CustomActionLink(GlobalRes.Back, "PriceListUnits", "PriceList", new { identity = Model.Identity, fullPrice = Model.ShowFull ? 0 : 1 }, new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "pricelist", InsertionMode = InsertionMode.Replace, OnFailure = "onFail" }, new { @class = "btn btn-outline-info w-100 h-100" }, "fas fa-compact-disc fa-pulse")
+</div>
+@foreach (MainOffice.Models.CashRegCode code in Model.CashRegCodes)
+{
+    <div class="col-sm-3 py-1" style="min-width:11rem">
+        <button class="btn btn-outline-success w-100 h-100" id="@("codeId" + code.Id)" onclick="onSuccessChooseCode(this)"><i class="fas fa-spinner fa-pulse" style="display:none" id="@("codeSpinner" + code.Id)"></i>@(code.Code + " | " + (code.Service != null ? code.Service.Name + (code.Service.ServiceVolume != null ? " | " + code.Service.ServiceVolume.Name : "") : code.Product.Name + (code.Product.ProductVolume != null ? " | " + code.Product.ProductVolume.Name : "") + (code.Product.Trademark != null ? " | " + code.Product.Trademark.Name : "") + (code.Product.Productline != null ? " | " + code.Product.Productline.Name : "")) + " | " + code.Price + " грн.")</button>
+        @*@Ajax.ActionLink(code.Code + " | " + (code.Service != null ? code.Service.Name + (code.Service.ServiceVolume != null ? " | " + code.Service.ServiceVolume.Name : "") : code.Product.Name + (code.Product.ProductVolume != null ? " | " + code.Product.ProductVolume.Name : "") + (code.Product.Trademark != null ? " | " + code.Product.Trademark.Name : "") + (code.Product.Productline != null ? " | " + code.Product.Productline.Name : "")) + " | " + code.Price + " грн.", "CodesList", new { PriceList = code.Id }, new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "pricelist", InsertionMode = InsertionMode.Replace }, new { @class = "btn btn-outline-success w-100 h-100" })*@
+    </div>
+}

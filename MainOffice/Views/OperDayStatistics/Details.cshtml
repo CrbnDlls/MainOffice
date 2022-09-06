@@ -1,0 +1,277 @@
+﻿@model MainOffice.Models.OperDayStatisticsViewModel
+@using MainOffice.Helpers
+@{
+    ViewBag.Title = "Срез детальный опер дня";
+}
+
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col" colspan="9">@GlobalRes.OperationDayArchiveShortName - Вермя среза: @Model.StatTime</th>
+            </tr>
+            <tr>
+                <th scope="col">@Html.DisplayNameFor(model => model.OpenTime)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.OpenEmployee)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.OperationDate)</th>
+                <th scope="col">
+                    @Html.DisplayNameFor(model => model.Salon)
+                    @if (Model.Alarm)
+                    {
+                        <button class="btn btn-outline-danger" id="@("popAlarm" + Model.Id)" data-toggle="popover">В салоне сейчас проверка</button>
+                        <div class="d-none" id="@("popAlarm" + Model.Id + "content")">
+                            @if (User.IsInRole("director") | User.IsInRole("admin"))
+                            {
+                                @Ajax.CustomActionLink("Проверка окончена", "DisableAlarm", "OperDayStatistics", new { Id = Model.Id }, new AjaxOptions() { Confirm = "Вы уверенны, что проверка закончилась ?", HttpMethod = "Post", OnFailure = "onFail", OnSuccess = "onSuccessAlarm" }, new { @class = "btn btn-outline-success" }, "fas fa-spinner fa-pulse")
+                            }
+                        </div>
+                    }
+                </th>
+                <th scope="col">@Html.DisplayNameFor(model => model.StaffQuantity)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.StaffQuantityBuisy)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.SummClosed)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.SummInWork)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.BOQuantity)</th>
+        </thead>
+        <tbody>
+
+            <tr>
+
+                <td>@Html.DisplayFor(model => model.OpenTime)</td>
+                <td>@Html.DisplayFor(model => model.OpenEmployee)</td>
+                <td>@Html.DisplayFor(model => model.OperationDate)</td>
+                <td>@Html.DisplayFor(model => model.Salon)</td>
+                <td>@Html.DisplayFor(model => model.StaffQuantity)</td>
+                <td>@Html.DisplayFor(model => model.StaffQuantityBuisy)</td>
+                <td>
+                    <button class="btn btn-outline-info" id="@("popSumm" + Model.Id)" data-toggle="popover">@Html.DisplayFor(model => model.SummClosed)</button>
+                    <div class="d-none" id="@("popSumm" + Model.Id + "content")">
+                        <table class="table-sm">
+                            <thead>
+                                <tr class="text-info">
+                                    <th scope="col">@Html.DisplayNameFor(model => model.KasaSumm)</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.TerminalSumm)</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.DepositSumm)</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.UnpaidSumm)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Html.DisplayFor(model => model.KasaSumm)</td>
+                                    <td>@Html.DisplayFor(model => model.TerminalSumm)</td>
+                                    <td>@Html.DisplayFor(model => model.DepositSumm)</td>
+                                    <td>@Html.DisplayFor(model => model.UnpaidSumm)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+                <td>@Html.DisplayFor(model => model.SummInWork)</td>
+                <td>@Html.DisplayFor(model => model.BOQuantity)</td>
+            </tr>
+
+        </tbody>
+    </table>
+    <hr />
+    <table class="table" id="tableWorkers">
+        <thead>
+            <tr>
+                <th scope="col" colspan="12">@GlobalRes.WorkSheets</th>
+            </tr>
+            <tr>
+                <th scope="col">№</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].Profession)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].BarberLevel)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].EmployeeName)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].StartPoint)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].StartEmployee)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].EndPoint)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].CloseEmployee)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].Status)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].Summ)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model.Employees[0].BoSumm)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Employees.Count; i++)
+            {
+                <tr id="@("row" + Model.Employees[i].Id)">
+                    <td>@(i + 1)</td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].Profession)</td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].BarberLevel)</td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].EmployeeName)</td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].StartPoint)</td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].StartEmployee)</td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].EndPoint)</td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].CloseEmployee)</td>
+                    <td>
+                        @if (Model.Employees[i].BillsInWork != null && Model.Employees[i].BillsInWork.Count > 0)
+                        {
+                            <button class="btn btn-outline-info" title="Показать счет" onclick="show(this)" id="@("inWork" + Model.Employees[i].Id)" value="@("inWork" + Model.Employees[i].Id)"><i class="fa fa-plus"></i></button>
+                        } @Html.DisplayFor(model => model.Employees[i].Status)
+                    </td>
+                    <td>
+                        @if (Model.Employees[i].ClosedBills != null && Model.Employees[i].ClosedBills.Count > 0)
+                        {
+                            <button class="btn btn-outline-info" title="Показать счета" onclick="show(this)" id="@("closed" + Model.Employees[i].Id)" value="@("closed" + Model.Employees[i].Id)"><i class="fa fa-plus"></i></button>
+                        } @Html.DisplayFor(model => model.Employees[i].Summ)
+                    </td>
+                    <td>@Html.DisplayFor(model => model.Employees[i].BoSumm)</td>
+                </tr>
+                if (Model.Employees[i].BillsInWork != null && Model.Employees[i].BillsInWork.Count > 0)
+                {
+                    for (int y = 0; y < Model.Employees[i].BillsInWork.Count; y++)
+                    {
+                        <tr class="@("inWork" + Model.Employees[i].Id)" style="display:none">
+                            <td></td>
+                            <td colspan="10">
+                                <table class="table">
+                                    <thead>
+                                        <tr class="@(Model.Employees[i].BillsInWork[y].BO ? "bg-warning" : "bg-info")">
+                                            <th scope="col">№ @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillNumber)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BO): @(Model.Employees[i].ClosedBills[y].BO ? GlobalRes.Yes : GlobalRes.No)</th>
+                                            <th scope="col"><i class="fas fa-play"></i> @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].StartTime) <i class="fas fa-flag-checkered"></i> @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].EndTime)</th>
+                                            <th scope="col" colspan="3">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].Client): @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].Client) @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].ClientPromo)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].InitialPromo): @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].InitialPromo)</th>
+                                            <th scope="col" colspan="2">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].VisaPromo): @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].VisaPromo)</th>
+                                            <th scope="col">@GlobalRes.Summ: @Html.DisplayFor(model => model.Employees[i].BillsInWork[y].Summ)</th>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].CashRegCode)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].ProductOrServiceName)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].Promotion)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].SellPrice)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].Quantity)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].InsertDateTime)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].CancelDateTime)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].BillsInWork[y].BillLines[0].AdminVisa)</th>
+                                            <th scope="col">@GlobalRes.Summ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int g = 0; g < Model.Employees[i].BillsInWork[y].BillLines.Count; g++)
+                                        {
+                                            <tr>
+                                                <th scope="row">@(g + 1)</th>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].CashRegCode)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].ProductOrServiceName)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].Promotion)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].SellPrice)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].Quantity)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].InsertDateTime)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].CancelDateTime)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].AdminVisa)</td>
+                                                <td @(Model.Employees[i].BillsInWork[y].BillLines[g].Cancel ? "class=bg-danger" : "")>@Html.DisplayFor(model => model.Employees[i].BillsInWork[y].BillLines[g].Summ)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+
+                    <tr class="@("inWork" + Model.Employees[i].Id)" style="display:none">
+                        <td class="table-secondary" colspan="11">
+                            <button class="btn btn-outline-info" title="Закрыть счет" onclick="hide(this)" value="@("inWork" + Model.Employees[i].Id)">Закрыть</button>
+                        </td>
+                    </tr>
+                }
+                if (Model.Employees[i].ClosedBills != null && Model.Employees[i].ClosedBills.Count > 0)
+                {
+                    for (int y = 0; y < Model.Employees[i].ClosedBills.Count; y++)
+                    {
+                        <tr class="@("closed" + Model.Employees[i].Id)" style="display:none">
+                            <td></td>
+                            <td colspan="10">
+                                <table class="table">
+                                    <thead>
+                                        <tr class="@(Model.Employees[i].ClosedBills[y].BO ? "bg-warning" : "bg-info")">
+                                            <th scope="col">№ @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillNumber)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BO): @(Model.Employees[i].ClosedBills[y].BO ? GlobalRes.Yes : GlobalRes.No)</th>
+                                            <th scope="col"><i class="fas fa-play"></i> @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].StartTime) <i class="fas fa-flag-checkered"></i> @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].EndTime)</th>
+                                            <th scope="col" colspan="3">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].Client): @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].Client) @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].ClientPromo)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].InitialPromo): @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].InitialPromo)</th>
+                                            <th scope="col" colspan="2">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].VisaPromo): @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].VisaPromo)</th>
+                                            <th scope="col">@GlobalRes.Summ: @Html.DisplayFor(model => model.Employees[i].ClosedBills[y].Summ)</th>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">№</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].CashRegCode)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].ProductOrServiceName)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].Promotion)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].SellPrice)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].Quantity)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].InsertDateTime)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].CancelDateTime)</th>
+                                            <th scope="col">@Html.DisplayNameFor(model => model.Employees[i].ClosedBills[y].BillLines[0].AdminVisa)</th>
+                                            <th scope="col">@GlobalRes.Summ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int g = 0; g < Model.Employees[i].ClosedBills[y].BillLines.Count; g++)
+                                        {
+                                            <tr>
+                                                <th scope="row">@(g + 1)</th>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].CashRegCode)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].ProductOrServiceName)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].Promotion)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].SellPrice)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].Quantity)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].InsertDateTime)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].CancelDateTime)</td>
+                                                <td>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].AdminVisa)</td>
+                                                <td @(Model.Employees[i].ClosedBills[y].BillLines[g].Cancel ? "class=bg-danger" : "")>@Html.DisplayFor(model => model.Employees[i].ClosedBills[y].BillLines[g].Summ)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="@("closed" + Model.Employees[i].Id)" style="display:none">
+                        <td class="table-secondary" colspan="11">
+                            <button class="btn btn-outline-info" title="Закрыть счета" onclick="hide(this)" value="@("closed" + Model.Employees[i].Id)">Закрыть</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+@section scripts
+{
+    <script type="text/javascript">
+        function show(sender) {
+            var elements = document.getElementsByClassName(sender.value);
+            elements.forEach(element => element.setAttribute('style', 'display:table-row'));
+            sender.onclick = function () { hide(sender) };
+            sender.children[0].className = "fa fa-minus";
+            var row = document.getElementById('row' + sender.value.substring(6)).className = 'table-secondary';
+        }
+        function hide(sender) {
+            var elements = document.getElementsByClassName(sender.value);
+            elements.forEach(element => element.setAttribute('style', 'display:none'));
+            var button = document.getElementById(sender.value);
+            button.onclick = function () { show(button) };
+            button.children[0].className = "fa fa-plus";
+            document.getElementById('row' + sender.value.substring(6)).className = '';
+        }
+        $('[data-toggle="popover"]').popover({
+            trigger: 'focus',
+            content: function () { return $('#' + this.id + 'content').html() },
+            html: true,
+            sanitize: false,
+            placement: 'top'
+        });
+        function onFail(xhr) {
+            alert('Действие не выполнено. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status)
+        }
+        function onSuccessAlarm(xhr) {
+            var element = document.getElementById("popAlarm" + xhr.data);
+            element.parentNode.removeChild(element);
+        }
+    </script>
+
+}
+

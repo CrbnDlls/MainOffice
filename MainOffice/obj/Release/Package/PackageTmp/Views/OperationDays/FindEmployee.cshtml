@@ -1,0 +1,438 @@
+﻿@model IEnumerable<MainOffice.Models.RegisterEmployeeViewModel>
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+@{
+    ViewBag.Title = GlobalRes.Create + " " + Html.DisplayCustomForModel("GroupName");
+    string sidebarHeight = ViewBag.TableHeight + "px";
+}
+
+<div class="container">
+    <div class="container-fluid body-content">
+        <div id="content">
+            <div class="toolbar">
+                <a href="@Url.Action("Index", "OperationDays")" class="btn btn-outline-warning"><i class="fas fa-undo-alt"></i> @GlobalRes.OperationDate</a>
+            </div>
+            <table id="tablegrid"
+                   data-search="true"
+                   data-minimum-count-columns="2"
+                   data-locale="@GlobalRes.CurrentCulture"
+                   data-height="@ViewBag.TableHeight"
+                   data-sortable="true"
+                   data-pagination="true"
+                   data-side-pagination="server"
+                   data-page-list="[10, 25, 50, 100, All]"
+                   data-page-size="10"
+                   data-method="post"
+                   data-unique-id="Id"
+                   data-click-to-select="true"
+                   data-toolbar=".toolbar"
+                   data-custom-sort="customSort"
+                   data-url="../OperationDays/FindEmployeeData">
+                <thead>
+                    <tr>
+                        <th title="@Html.DisplayCustomForModel("GroupName")" colspan="7" data-valign="middle" data-halign="center" data-align="center">
+                            @Html.DisplayCustomForModel("GroupName")
+                        </th>
+                        <th data-field="operate" rowspan="2" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-formatter="operateFormatter">@GlobalRes.Actions</th>
+                    </tr>
+                    <tr>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.StaffNumber)" data-field="StaffNumber" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.StaffNumber)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.FamilyName)" data-field="FamilyName" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.FamilyName)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.Name)" data-field="Name" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.Name)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.Profession)" data-field="Profession" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.Profession)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.BarberLevel)" data-field="BarberLevel" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.BarberLevel)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.PriceListUnits)" data-field="PriceListUnits" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.PriceListUnits)
+                        </th>
+                        <th data-title-tooltip="@Html.DisplayNameFor(model => model.Salon)" data-field="Salon" data-sortable="true" data-cell-style="cellStyle" data-valign="middle" data-halign="center" data-align="center" data-falign="center" data-footer-formatter="totalNameFormatter">
+                            @Html.DisplayShortNameFor(model => model.Salon)
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <div id="windowmodal" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body" id="modalform">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+@section scripts
+{
+    @{
+        var locale = GlobalRes.CurrentCulture;
+        var path = "/Scripts/i18n/defaults-" + locale.Replace("-", "_") + ".min.js";
+        <script src="@path"></script>
+    }
+    <script type="text/javascript">
+
+    var $table = $('#tablegrid')
+   
+
+    function detailFormatter(index, row) {
+        var html = []
+        var tableOptions = $table.bootstrapTable('getOptions');
+        var column = tableOptions.columns[1];
+        $.each(column, function (key, value) {
+            var text = getProp(row, value.field);
+            html.push('<p><b>' + value.titleTooltip + ':</b> ' + (text == null | text == '' ? '@GlobalRes.Empty' : text) + '</p>')
+        });
+
+        return html.join('')
+    }
+
+    function customSort(sortName, sortOrder, data)
+    {
+        var order = sortOrder === 'desc' ? -1 : 1;
+        var tableOptions = $table.bootstrapTable('getOptions');
+        var dataType = undefined;
+        for (var i = 0; i < tableOptions.columns[1].length; i++)
+        {
+            if (tableOptions.columns[1][i].field == sortName)
+            {
+                dataType = tableOptions.columns[1][i].typeName;
+            }
+        }
+        data.sort(function (a, b) {
+            var aa = getItemField(a, sortName, tableOptions.escape);
+            var bb = getItemField(b, sortName, tableOptions.escape);
+            return sort(aa, bb, order, tableOptions.sortStable, dataType);
+        })
+    }
+    function sort(a, b, order, sortStable, dataType) {
+        if (a === undefined || a === null) {
+            a = '';
+        }
+
+        if (b === undefined || b === null) {
+            b = '';
+        }
+
+        if (sortStable && a === b) {
+            a = a._position;
+            b = b._position;
+        } // If both values are numeric, do a numeric comparison
+
+
+        if (this.isNumeric(a) && this.isNumeric(b)) {
+            // Convert numerical values form string to float.
+            a = parseFloat(a);
+            b = parseFloat(b);
+
+            if (a < b) {
+                return order * -1;
+            }
+
+            if (a > b) {
+                return order;
+            }
+
+            return 0;
+        }
+
+        if (a === b) {
+            return 0;
+        } // If value is not a string, convert to string
+
+        if (dataType === 'Date')
+        {
+            var aa = new Date(fromLocalDate(a));
+            var bb = new Date(fromLocalDate(b));
+
+            if (aa < bb) {
+                return order * -1;
+            }
+
+            if (aa > bb) {
+                return order;
+            }
+            return 0;
+        }
+        if (typeof a !== 'string') {
+            a = a.toString();
+        }
+
+        if (a.localeCompare(b) === -1) {
+            return order * -1;
+        }
+
+        return order;
+    }
+    function fromLocalDate(date)
+    {
+        if (date == '')
+        {
+            return '0000-01-01'
+        }
+        var sampleDate = new Date('1976-08-02');
+        var sampleString = sampleDate.toLocaleDateString()
+        var startY = sampleString.indexOf(1);
+        var endY = sampleString.indexOf(6);
+        var m = sampleString.indexOf(8);
+        var d = sampleString.indexOf(2);
+        var year = date.substring(startY, endY + 1);
+        var month = undefined;
+        var day = undefined;
+        if (date.substring(m - 1, m + 1).length == 1) {
+            month = '0' + date.substring(m - 1, m + 1);
+        }
+        else {
+            if (Number.isInteger(parseInt(date.substring(m - 1, m + 1)))) {
+                month = date.substring(m - 1, m + 1);
+            }
+            else {
+                month = '0' + date.substring(m, m + 1);
+            }
+
+        }
+        if (date.substring(d - 1, d + 1).length == 1) {
+            day = '0' + date.substring(d - 1, d + 1);
+        }
+        else {
+            if (Number.isInteger(parseInt(date.substring(d - 1, d + 1)))) {
+                day = date.substring(d - 1, d + 1);
+            }
+            else {
+                day = '0' + date.substring(d, d + 1);
+            }
+
+        }
+        return year + '-' + month + '-' + day
+    }
+    function isNumeric(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+    function getItemField(item, field, escape) {
+        var value = item;
+
+        if (typeof field !== 'string' || item.hasOwnProperty(field)) {
+            return escape ? this.escapeHTML(item[field]) : item[field];
+        }
+
+        var props = field.split('.');
+        var _iteratorNormalCompletion7 = true;
+        var _didIteratorError7 = false;
+        var _iteratorError7 = undefined;
+
+        try {
+            for (var _iterator7 = props[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                var p = _step7.value;
+                value = value && value[p];
+            }
+        } catch (err) {
+            _didIteratorError7 = true;
+            _iteratorError7 = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion7 && _iterator7.return != null) {
+                    _iterator7.return();
+                }
+            } finally {
+                if (_didIteratorError7) {
+                    throw _iteratorError7;
+                }
+            }
+        }
+
+        return escape ? this.escapeHTML(value) : value;
+    }
+        function operateFormatter(value, row, index) {
+            if (row.Salon)
+            {
+                return [
+            '<div class="btn-group" aria-label="Toolbar with button groups">',
+            '<button onclick="addWorkSheet(this)" id="buttonAdd' + row.Id + '" class="btn btn-success" disabled>Лист открыт ',
+            '<i class="fas fa-check" aria-hidden="true"></i>',
+            '</button>'
+        ].join('')
+            }
+            else
+            {
+                return [
+            '<div class="btn-group" aria-label="Toolbar with button groups">',
+            '<button onclick="addWorkSheet(this)" id="buttonAdd' + row.Id + '" class="btn btn-outline-warning">',
+            '<i class="fas fa-spinner fa-pulse" style="display:none" id="addWorkSheetSpinner' + row.Id + '"></i>@GlobalRes.OpenWorkSheet ',
+            '<i class="fas fa-pen-alt" aria-hidden="true"></i>',
+            '</button>'
+        ].join('')
+            }
+            
+    }
+
+        function addWorkSheet(btn) {
+            var row = $table.bootstrapTable('getRowByUniqueId', btn.id.substring(9));
+            if (confirm('@GlobalRes.OpenWorkSheet для ' + row.StaffNumber + ' ' + row.FamilyName + ' ' + row.Name + ' ?')) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("AddWorkSheet", "OperationDays")",
+                    data: {
+                        message: row.Id 
+                    },
+                    beforeSend: function () {
+                        document.getElementById('addWorkSheetSpinner' + row.Id).style.display = 'block'
+                    },
+                    success: function (data) {
+                        if (data.result === 'success') {
+                            updateRow(data.data);
+                        }
+                        else {
+                            alert(data.message)
+                        }
+                    },
+                    error: function () { alert('Действие не выполнено. Статус: ' + xhr.status + ', Тест статуса: ' + xhr.status) },
+                    complete: function () { document.getElementById('addWorkSheetSpinner' + row.Id).style.display = 'none' }
+                })
+            }
+        }
+    function totalTextFormatter(data) {
+        return '@GlobalRes.Total'
+    }
+
+    function totalNameFormatter(data) {
+        return data.length
+    }
+
+    function totalPriceFormatter(data) {
+        var field = this.field
+        return '$' + data.map(function (row) {
+            return +row[field].substring(1)
+        }).reduce(function (sum, i) {
+            return sum + i
+        }, 0)
+    }
+    function runningFormatter(value, row, index) {
+
+        var tableOptions = $table.bootstrapTable('getOptions');
+        var result = index + 1
+        if (tableOptions.sidePagination == 'server' & typeof (tableOptions.pageSize) === 'number') {
+            result = ((tableOptions.pageNumber - 1) * tableOptions.pageSize) + (1 + index);
+        }
+        return result
+    }
+
+        function onSuccessEdit(data) {
+            if (data.result == 'success') {
+                updateRow(data.data);
+                $('#windowmodal').modal('hide');
+            }
+            else {
+                document.getElementById('EditForm').setAttribute('was-validated', '');
+            }
+        }
+    function updateRow(data) {
+        $table.bootstrapTable('updateByUniqueId', {
+            id: data.Id,
+            row: data,
+            replace: true
+        })
+        document.getElementById('buttonAdd' + data.Id).disabled = true;
+        document.getElementById('buttonAdd' + data.Id).setAttribute('class', 'btn btn-success');
+    }
+    
+
+    function onEditOpen() {
+        if (Modernizr.es5date) {
+            // supported
+            var inputs = document.querySelectorAll("input[type=date]");
+            for (var index = 0; index < inputs.length; index++) {
+                if (inputs[index].defaultValue != undefined || inputs[index].defaultValue != '')
+                    inputs[index].value = fromLocalDate(inputs[index].defaultValue);
+            }
+
+        } else {
+            // not-supported
+        }
+    }
+
+    function setFilters(data)
+    {
+
+        $('#sidebar').toggleClass('active');
+        $('.navbar').toggleClass('moveright');
+
+        setTimeout(function () {
+            if (data.ServerSide == true) {
+                $table.bootstrapTable('refreshOptions', {
+                    sidePagination: 'server'
+                })
+                $table.bootstrapTable('refresh');
+           }
+            else {
+                $table.bootstrapTable('refreshOptions', {
+                    sidePagination: 'client'
+                })
+                $table.bootstrapTable('refresh');
+                }
+        }, 100);
+
+
+    }
+    function telInput(sender) {
+        if (sender.value.length == 10 & !isNaN(sender.value)) {
+            sender.value = '(' + sender.value.substring(0, 3) + ') ' + sender.value.substring(3, 6) + '-' + sender.value.substring(6, 8) + '-' + sender.value.substring(8, 10);
+        }
+    }
+
+        $("document").ready(function () {
+
+            $table.bootstrapTable();
+
+            $("document").on('resize', function () {
+                $('#tablegrid').bootstrapTable('resetView');
+            });
+
+            $table.on('all.bs.table', function (e, name, args) {
+                console.log(name, args)
+            });
+        })
+		function cellStyle(value, row, index, field) {
+
+        if (row.DelayedUpdateEmployee != null) {
+            if (getProp(row.DelayedUpdateEmployee, field) != value) {
+                return {
+                    classes: 'bg-warning'
+                }
+            }
+        }
+        return {
+            css: {
+                color: 'black'
+            }
+        }
+    }
+			 function getProp(obj, prop) {
+				if (typeof obj !== 'object') throw 'getProp: obj is not an object';
+				if (typeof prop !== 'string') throw 'getProp: prop is not a string';
+
+				// Replace [] notation with dot notation
+				prop = prop.replace(/\[["'`](.*)["'`]\]/g, ".$1");
+
+				return prop.split('.').reduce(function (prev, curr) {
+					return prev ? prev[curr] : undefined
+				}, obj || self)
+			}
+
+    
+
+    </script>
+}
+

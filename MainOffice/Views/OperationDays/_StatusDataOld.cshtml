@@ -1,0 +1,97 @@
+﻿@model IEnumerable<MainOffice.Models.StaffStatusOperDayViewModel>
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+<div class="row no-gutters">
+    @foreach (MainOffice.Models.StaffStatusOperDayViewModel unit in Model)
+    {
+        int cardCount = 0;
+        foreach (MainOffice.Models.StatusMasterCardViewModel card in unit.Staff)
+        {
+            cardCount = cardCount + 1;
+    <div class="col-auto" @*style="width:19.6vw;"*@>
+        <div class="row no-gutters">
+            <div class="@(cardCount == 1 ? "rounded-left " : "" )@(cardCount == unit.Staff.Count ? "rounded-right " : "" )w-100 text-center" style="background-color:#@unit.Color">
+                @(cardCount == 1 ? Html.Raw("<span class=\"text-light\">" + unit.Profession + "</span>") : Html.Raw("<span style=\"color:#" + unit.Color + "\">.</span>") )
+            </div>
+        </div>
+        <div class="row no-gutters rounded-top border border-bottom-0 border-@(card.IsBusy ? "danger" : "success")">
+            <div class="col-auto"><form method="post" action="@Url.Action("Bills", "OperationDays")"><input type="hidden" name="id" value="@card.Id" /><input type="submit" class="btn btn-outline-info" value="Счета" /></form></div>
+            <div class="col-auto align-self-center ml-1 @(card.IsBusy ? "text-danger" : "text-success")" style="font-weight:500;font-size:1.2rem">@card.FIO</div>
+        </div>
+        <div class="row no-gutters rounded-bottom border border-top-0 border-@(card.IsBusy ? "danger" : "success") align-items-center">
+            <div class="col-auto">
+            @if (card.IsBusy)
+            { 
+                <div class="row no-gutters align-items-center">
+                    <div class="col-auto">Время с начала обслуживания:</div>
+                    <div class="col-auto"><a tabindex="0" role="button" class="btn btn-@(card.CallForVisa ? "primary" : "secondary") text-light float-right" data-toggle="popover" id="@("pop" + card.Id)">@card.time@(card.CallForVisa ? Html.Raw(" <i id=\"excl" + card.bill.Id + "\" class=\"fas fa-exclamation\"></i>") : Html.Raw(""))</a></div>
+                </div>
+            }
+                <div class="row no-gutters align-items-center">
+                    <div class="col-auto">Время до следующей записи:</div>
+                    <div class="col-auto"><a class="btn btn-light" href="#">00:00</a></div>
+                </div>
+            </div>
+        </div>
+        @*<div class="row no-gutters rounded-top border border-bottom-0 border-@(card.IsBusy ? "danger" : "success")">
+            <div class="col-auto"><form method="post" action="@Url.Action("Bills", "OperationDays")"><input type="hidden" name="id" value="@card.Id" /><input type="submit" class="btn btn-outline-info" value="Счета"/></form></div>
+            <div class="col-auto align-self-center ml-1 @(card.IsBusy ? "text-danger" : "text-success")" style="font-weight:500;font-size:1.2rem">@card.FIO</div>
+        </div>
+        <div class="row no-gutters rounded-bottom border border-top-0 border-@(card.IsBusy ? "danger" : "success")">
+            <div class="col-auto">@(card.IsBusy ? "Занят. Время с начала обслуживания:" : "Свободен. Время до следующей записи:") <a tabindex="0" role="button" class="btn btn-@(card.CallForVisa ? "primary" : "secondary") text-light float-right" data-toggle="popover" id="@("pop" + card.Id)">@card.time@(card.CallForVisa ? Html.Raw(" <i id=\"excl" + card.bill.Id + "\" class=\"fas fa-exclamation\"></i>") : Html.Raw(""))</a></div>
+        </div>*@
+    </div>
+
+            if (card.IsBusy)
+            {
+                decimal Summ = 0;
+                for (int i = 0; i < card.bill.BillLines.Count; i++)
+                {
+                    if (!card.bill.BillLines[i].Cancel)
+                    {
+                        Summ = Summ + (card.bill.BillLines[i].SellPrice * card.bill.BillLines[i].Quantity);
+                    }
+                }
+
+                    <div class="d-none" id="@("pop" + card.Id + "content")">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" colspan="1">№ @card.bill.BillNumber</th>
+                                    <th scope="col" colspan="3">@GlobalRes.InitialPromo: @card.bill.InitialPromo</th>
+                                    <th scope="col" colspan="1">@GlobalRes.Summ:</th>
+                                    <th scope="col" colspan="2">@Summ</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">№</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.Staff[0].bill.BillLines[0].CashRegCode)</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.Staff[0].bill.BillLines[0].ProductOrServiceName)</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.Staff[0].bill.BillLines[0].Promotion)</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.Staff[0].bill.BillLines[0].SellPrice)</th>
+                                    <th scope="col">@Html.DisplayNameFor(model => model.Staff[0].bill.BillLines[0].Quantity)</th>
+                                    <th scope="col">@GlobalRes.Summ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < card.bill.BillLines.Count; i++)
+                                {
+                                    <tr @(card.bill.BillLines[i].Cancel ? "class=bg-danger" : "")>
+                                        <th scope="row">@(i + 1)</th>
+                                        <td>@card.bill.BillLines[i].CashRegCode</td>
+                                        <td>@card.bill.BillLines[i].ProductOrServiceName</td>
+                                        <td>@card.bill.BillLines[i].Promotion</td>
+                                        <td>@card.bill.BillLines[i].SellPrice</td>
+                                        <td>@card.bill.BillLines[i].Quantity</td>
+                                        <td>@(card.bill.BillLines[i].SellPrice * card.bill.BillLines[i].Quantity)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @(card.CallForVisa ? Ajax.ActionLink("Подписать", "Sign", new { id = card.bill.Id, card = card.Id, version = Convert.ToBase64String(card.bill.RowVersion) }, new AjaxOptions() { HttpMethod = "Post", OnSuccess = "signSuccess", OnFailure = "signFail" }, new { @class = "btn btn-primary", id = "buttonSign" + card.bill.Id }) : null)
+                    </div>
+            }
+        }
+
+    }
+</div>

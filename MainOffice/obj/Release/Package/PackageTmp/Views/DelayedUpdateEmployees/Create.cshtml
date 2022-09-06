@@ -1,0 +1,166 @@
+﻿@model MainOffice.Models.DelayedUpdateEmployee
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+@{
+    ViewBag.Title = GlobalRes.Create + " " + Html.DisplayCustomForModel("Name").ToString();
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@String.Concat(new string[] { Html.DisplayCustomForModel("Name").ToString(), " - ", GlobalRes.Create })</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@using (Ajax.BeginForm("Create", null, new AjaxOptions { OnSuccess = "onSuccessCreate", UpdateTargetId = "modalform", LoadingElementId = "createLoading" }, new { id = "CreateForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <hr class="border border-primary" />
+
+    <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.FamilyName, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.FamilyName, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.FamilyName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.FathersName, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.FathersName, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.FathersName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.BirthDay, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.BirthDay, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.BirthDay, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.OldFamilyName, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.OldFamilyName, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.OldFamilyName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.ProfessionId, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.ProfessionId, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.ProfessionId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.BarberLevelId, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.BarberLevelId, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.BarberLevelId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.SalonId, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.SalonId, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.SalonId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.HireDate, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.HireDate, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.HireDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.StaffNumber, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.StaffNumber, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.StaffNumber, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.PhoneNumber1, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.PhoneNumber1, new { htmlAttributes = new { @class = "form-control", placeholder = "(0XX) XXX-XX-XX", oninput = "telInput(this)" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.PhoneNumber1, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.PhoneNumber2, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.PhoneNumber2, new { htmlAttributes = new { @class = "form-control", placeholder = "(0XX) XXX-XX-XX", oninput = "telInput(this)" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.PhoneNumber2, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.CompanyId, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.CompanyId, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.CompanyId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.RegisterDate, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.RegisterDate, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.RegisterDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.DismissalDate, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.DismissalDate, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.DismissalDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" />
+    <div class="form-row">
+        <div class="form-group col">
+            <div class="row">
+                <div class="col text-center">
+                    @Html.LabelFor(model => model.PriceListUnits, htmlAttributes: new { @class = "control-label" })
+                </div>
+            </div>
+            @Html.ManyToManyCheckBoxList("PriceListUnits", Model != null ? Model.PriceListUnits : null, (IEnumerable<MainOffice.Models.PriceListUnit>)ViewBag.PriceListUnits, null, "border-bottom border-right border-primary")
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.PriceListUnits, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.UpdateDate, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.UpdateDate, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.UpdateDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" />
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-outline-success"><i class="fas fa-spinner fa-pulse" style="display:none" id="createLoading"></i> @GlobalRes.Save</button>
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+    </div>
+}

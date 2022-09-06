@@ -1,0 +1,22 @@
+﻿@model MainOffice.Models.PriceListSelectViewModel
+@using MainOffice.Helpers
+@if (Model.ShowFull == true)
+{
+    <div class="col-sm-3 py-1" style="min-width:11rem">
+        @Ajax.CustomActionLink(GlobalRes.Back, "PriceListUnits","PriceList", new { identity = Model.Identity }, new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "pricelist", InsertionMode = InsertionMode.Replace, OnFailure = "onFail" }, new { @class = "btn btn-outline-info w-100 h-100" }, "fas fa-compact-disc fa-pulse")
+    </div>
+}
+@foreach (MainOffice.Models.PriceListUnit unit in Model.PriceListUnits)
+{
+    <div class="col-sm-3 py-1" style="min-width:11rem">
+
+        @if (unit.Id == 0)
+        {
+            @Ajax.CustomActionLink(unit.Name, "PriceListUnits", "PriceList", new { identity = Model.Identity, fullPrice = 0 }, new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "pricelist", InsertionMode = InsertionMode.Replace, OnFailure = "onFail" }, new { @class = "btn btn-outline-info w-100 h-100" }, "fas fa-compact-disc fa-pulse")
+        }
+        else
+        {
+            @Ajax.CustomActionLink(unit.Name, "CodesList", "PriceList", new { PriceList = unit.Id, identity = Model.Identity, fullPrice = Model.ShowFull ? 0 : 1 }, new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "pricelist", InsertionMode = InsertionMode.Replace, OnFailure = "onFail" }, new { @class = "btn btn-outline-info w-100 h-100" }, "fas fa-compact-disc fa-pulse")
+        }
+    </div>
+}

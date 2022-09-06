@@ -1,0 +1,95 @@
+﻿@model MainOffice.Models.Salon
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+@{
+    ViewBag.Title = GlobalRes.Create + " " + Html.DisplayCustomForModel("Name").ToString();
+}
+
+<div class="modal-header" id="modalTop">
+    <h5 class="modal-title">@String.Concat(new string[]{Html.DisplayCustomForModel("Name").ToString(), " - ",GlobalRes.Create})</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@using (Ajax.BeginForm("Create", null, new AjaxOptions { OnSuccess = "onSuccessCreate", UpdateTargetId = "modalform", LoadingElementId= "createLoading", OnFailure = "failSave" }, new { id = "CreateForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <hr class="border border-primary" />
+
+        <div class="form-row">
+		<div class="form-group col">
+				@Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+				<div class="form-group col">
+				@Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+            </div>
+        </div>
+				<div class="form-group col">
+				@Html.LabelFor(model => model.PhoneNumber1, htmlAttributes: new { @class = "control-label" })
+                 @Html.ValidationEditorFor(model => model.PhoneNumber1, new { htmlAttributes = new { @class = "form-control", placeholder = "(0XX) XXX-XX-XX", oninput = "telInput(this)" } })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.PhoneNumber1, "", new { @class = "text-danger" })
+            </div>
+        </div>
+		</div>
+                    <hr class="border border-primary" />        <div class="form-row">
+		<div class="form-group col">
+				@Html.LabelFor(model => model.PhoneNumber2, htmlAttributes: new { @class = "control-label" })
+                 @Html.ValidationEditorFor(model => model.PhoneNumber2, new { htmlAttributes = new { @class = "form-control", placeholder = "(0XX) XXX-XX-XX", oninput = "telInput(this)" } })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.PhoneNumber2, "", new { @class = "text-danger" })
+            </div>
+        </div>
+				<div class="form-group col">
+				@Html.LabelFor(model => model.SalonStateId, htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationDropDownListFor(model => model.SalonStateId, null, htmlAttributes: new { @class = "form-control" })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.SalonStateId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+				<div class="form-group col">
+				@Html.LabelFor(model => model.SalonTypeId, htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationDropDownListFor(model => model.SalonTypeId, null, htmlAttributes: new { @class = "form-control" })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.SalonTypeId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+		</div>
+                    <hr class="border border-primary" />        <div class="form-row">
+		<div class="form-group col">
+				@Html.LabelFor(model => model.Longitude, htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.Longitude, new { htmlAttributes = new { @class = "form-control" } })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Longitude, "", new { @class = "text-danger" })
+            </div>
+        </div>
+				<div class="form-group col">
+				@Html.LabelFor(model => model.Latitude, htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.Latitude, new { htmlAttributes = new { @class = "form-control" } })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Latitude, "", new { @class = "text-danger" })
+            </div>
+        </div>
+				<div class="form-group col">
+				@Html.LabelFor(model => model.IP, htmlAttributes: new { @class = "control-label" })
+                @Html.ValidationEditorFor(model => model.IP, new { htmlAttributes = new { @class = "form-control" } })
+<div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.IP, "", new { @class = "text-danger" })
+            </div>
+        </div>
+		</div>
+                    <hr class="border border-primary" />	
+<div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-success"><i class="fas fa-spinner fa-pulse" style="display:none" id="createLoading"></i> @GlobalRes.Save</button>
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+                    </div>
+}

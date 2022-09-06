@@ -1,0 +1,164 @@
+﻿@model MainOffice.Models.DelayedUpdateEmployee
+@using MainOffice.App_LocalResources
+
+@{
+    ViewBag.Title = GlobalRes.Delete;
+}
+
+<h2>@GlobalRes.Delete</h2>
+
+<div class="modal-header">
+    <h5 class="modal-title">@GlobalRes.DeleteConfirm</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<hr class="border-primary" />
+@if (!String.IsNullOrEmpty(ViewBag.ConcurrencyError))
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewBag.ConcurrencyError
+    </div>
+}
+
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.FamilyName)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.FamilyName)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Name)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.Name)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.FathersName)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.FathersName)
+    </dd>
+</dl>
+<hr class="border-primary" />
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.BirthDay)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.BirthDay)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.OldFamilyName)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.OldFamilyName)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.HireDate)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.HireDate)
+    </dd>
+</dl>
+<hr class="border-primary" />
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.StaffNumber)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.StaffNumber)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.PhoneNumber1)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.PhoneNumber1)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.PhoneNumber2)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.PhoneNumber2)
+    </dd>
+</dl>
+<hr class="border-primary" />
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.RegisterDate)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.RegisterDate)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.DismissalDate)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.DismissalDate)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.UpdateDate)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.UpdateDate)
+    </dd>
+</dl>
+<hr class="border-primary" />
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.BarberLevel)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.BarberLevel.Name)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Company)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.Company.Name)
+    </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Profession)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.Profession.Name)
+    </dd>
+</dl>
+<hr class="border-primary" />
+<dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Salon)
+    </dt>
+
+    <dd class="col-sm-2">
+        @Html.DisplayFor(model => model.Salon.Name)
+    </dd>
+</dl>
+<hr class="border-primary" />
+@using (Ajax.BeginForm("Delete", null, new AjaxOptions { OnSuccess = "deleteRow", UpdateTargetId = "modalform", LoadingElementId = "deleteLoading" }, new { id = "DeleteForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.Id);
+    @Html.HiddenFor(model => model.RowVersion);
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-outline-danger float-left"><i class="fas fa-spinner fa-pulse" style="display:none" id="deleteLoading"></i> @GlobalRes.Delete</button>
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+    </div>
+
+}

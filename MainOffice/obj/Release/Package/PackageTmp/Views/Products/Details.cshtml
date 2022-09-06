@@ -1,0 +1,54 @@
+﻿@model MainOffice.Models.Product
+
+@{
+    ViewBag.Title = "Подробности";
+}
+
+<h2>Подробности</h2>
+
+<div>
+    <h4>@ViewData.ModelMetadata.AdditionalValues["ShortName"]</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RowVersion)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RowVersion)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.Productline)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Productline.Name)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.ProductVolume)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductVolume.Name)
+        </dd>
+		<dt>
+            @Html.DisplayNameFor(model => model.Trademark)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Trademark.Name)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Вернуться к списку", "Index")
+</p>

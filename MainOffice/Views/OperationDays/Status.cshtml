@@ -1,0 +1,118 @@
+﻿
+@{
+    ViewBag.Title = "Статус";
+}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOper" aria-controls="navbarOper" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarOper">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                @Html.ActionLink("Операционный день", "Index", null, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item active">
+                @Html.ActionLink("Статус", "Status", null, new { @class = "nav-link" })
+            </li>
+            <li class="nav-item">
+                <div class="spinner-grow text-warning mx-auto" role="status" id="loadSpinner" style="display:none;">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item">
+                @Html.ActionLink("Суммы за день", "GetDaySumm", null, new { @class = "nav-link" })
+            </li>
+        </ul>
+    </div>
+</nav>
+@*<div style="display:none;" id="loading">Загрузка...<i class="fas fa-compact-disc fa-pulse"></i></div>*@
+<div class="container-fluid" id="staffData">
+    
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $("document").ready(function () {
+            getData();
+            var timer = setInterval(function () { getData(); }, 60000);
+
+            
+        })
+        function getData() {
+            $('.popover').popover('dispose');
+
+            $.ajax({
+            type: "GET",
+            url: "@Url.Action("StatusData", "OperationDays")",
+            beforeSend: function () {
+                document.getElementById('loadSpinner').style.display = 'block'
+            },
+            success: function (data) {
+                $("#staffData").html(data);
+                $('[data-toggle="popover"]').popover({
+                    trigger: 'focus',
+                    content: function () { return $('#' + this.id + 'content').html() },
+                    html: true,
+                    sanitize: false
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert(textStatus + ' ' + errorThrown)
+            },
+            complete: function () { document.getElementById('loadSpinner').style.display = 'none' }
+            })
+        }
+        function getPopover(id)
+        {
+            return $(id).html
+        }
+        function signFail(request, error)
+        {
+            alert('Действие не выполнено. ' + request.status + ' ' + request.statusText);
+        }
+        function signSuccess(data)
+        {
+            if (data.result == 'success')
+            {
+                var element = document.getElementById('excl' + data.id);
+                element.parentNode.removeChild(element);
+                element = document.getElementById('buttonSign' + data.id);
+                element.parentNode.removeChild(element);
+                element = document.getElementById('pop' + data.card);
+                element.className = "btn btn-secondary text-light float-right";
+            }
+            else
+            {
+                alert('Действие не выполнено. ' + data.message);
+            }
+        }
+        function paySuccess(data) {
+            if (data.result == 'success') {
+                if (data.count == 0)
+                {
+                    var elements = document.getElementsByClassName('pay');
+                    elements.forEach(element => element.parentNode.removeChild(element));
+                }
+                else
+                {
+                    var element = document.getElementById('tablePay' + data.id);
+                    element.parentNode.removeChild(element); 
+                    element = document.getElementById('popPay' + data.card);
+                    element.innerText = data.count;
+                }
+                document.getElementById('KasaSumm').innerText = data.kasa;
+                document.getElementById('TerminalSumm').innerText = data.terminal;
+                document.getElementById('DepositSumm').innerText = data.deposit;
+                document.getElementById('UnpaidSumm').innerText = data.unpaid;
+                document.getElementById('SummClosed').innerText = data.closed;
+                
+            }
+            else {
+                alert('Действие не выполнено. ' + data.message);
+            }
+        }
+    </script>
+}

@@ -1,0 +1,126 @@
+﻿@model MainOffice.Models.CashRegCode
+@using MainOffice.App_LocalResources
+@using MainOffice.Helpers
+
+@{
+    /**/
+
+    ViewBag.Title = GlobalRes.Create + " " + Html.DisplayCustomForModel("Name").ToString();
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">@String.Concat(new string[] { Html.DisplayCustomForModel("Name").ToString(), " - ", GlobalRes.Create })</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@using (Ajax.BeginForm("Create", null, new AjaxOptions { OnSuccess = "onSuccessCreate", UpdateTargetId = "modalform" }, new { id = "CreateForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <hr class="border border-primary" />
+
+    <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.PriceListUnit, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationDropDownListFor(model => model.PriceListUnitId, null, htmlAttributes: new { @class = "form-control" })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.PriceListUnitId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+
+        </div>
+    </div>
+    <hr class="border border-primary" />
+    <div class="form-row">
+        <div class="form-group col">
+            <div class="form-check">
+                @if (Model == null || Model.RadiosSwitch == null)
+                {
+                    @Html.RadioButtonFor(model => model.RadiosSwitch, "product", new { @class = "form-check-input", id = "radios1", onchange = "selectProduct()", @checked="checked" })
+                }
+                else
+                {
+                    @Html.RadioButtonFor(model => model.RadiosSwitch, "product", new { @class = "form-check-input", id = "radios1", onchange = "selectProduct()" });
+                }
+                @Html.LabelFor(model => model.Product.Name, htmlAttributes: new { @class = "form-check-label", @for = "radios1" })
+            </div>
+            @if (Model != null && Model.RadiosSwitch != null && Model.RadiosSwitch == "service")
+            {
+                @Html.ValidationDropDownListFor(model => model.ProductId, null, htmlAttributes: new { @class = "form-control", id = "productSelect", disabled = "true" })
+            }
+            else
+            {
+                @Html.ValidationDropDownListFor(model => model.ProductId, null, htmlAttributes: new { @class = "form-control", id = "productSelect" })
+            }
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.ProductId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            <div class="form-check">
+                @Html.RadioButtonFor(model => model.RadiosSwitch, "service", new { @class = "form-check-input", id = "radios2", onchange = "selectService()" })
+                @Html.LabelFor(model => model.Service.Name, htmlAttributes: new { @class = "form-check-label", @for = "radios2" })
+            </div>
+            @if (Model != null && Model.RadiosSwitch != null && Model.RadiosSwitch == "service")
+            {
+                @Html.ValidationDropDownListFor(model => model.ServiceId, null, htmlAttributes: new { @class = "form-control", id = "serviceSelect" })
+            }
+            else
+            {
+                @Html.ValidationDropDownListFor(model => model.ServiceId, null, htmlAttributes: new { @class = "form-control", id = "serviceSelect", disabled="true" })
+            }
+
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.ServiceId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+    </div>
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Price10, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.Price10, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Price10, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" /> <div class="form-row">
+        <div class="form-group col">
+            @Html.LabelFor(model => model.Price50, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.Price50, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.Price50, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group col">
+            @Html.LabelFor(model => model.PriceStaff, htmlAttributes: new { @class = "control-label" })
+            @Html.ValidationEditorFor(model => model.PriceStaff, new { htmlAttributes = new { @class = "form-control" } })
+            <div class="invalid-feedback">
+                @Html.ValidationMessageFor(model => model.PriceStaff, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <hr class="border border-primary" />
+
+    <div class="modal-footer">
+        <input type="submit" value="@GlobalRes.Save" class="btn btn-outline-success" />
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">@GlobalRes.Close</button>
+    </div>
+}

@@ -1,0 +1,48 @@
+﻿@model List<MainOffice.Models.OperDayStatisticsViewModel>
+
+@{
+    ViewBag.Title = "Статистика Опер День";
+}
+
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col" colspan="11">@GlobalRes.OperationDayArchiveShortNameList</th>
+            </tr>
+            <tr>
+                <th scope="col">№</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].OperationDate)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].Salon)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].OpenTime)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].OpenEmployee)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].StaffQuantity)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].StaffQuantityBuisy)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].SummClosed)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].SummInWork)</th>
+                <th scope="col">@Html.DisplayNameFor(model => model[0].BOQuantity)</th>
+                <th scope="col">Детально</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+            <tr>
+                <th>@(i + 1)</th>
+                <td>@Html.DisplayFor(model => model[i].OperationDate)</td>
+                <td>@Html.DisplayFor(model => model[i].Salon)</td>
+                <td>@Html.DisplayFor(model => model[i].OpenTime)</td>
+                <td>@Html.DisplayFor(model => model[i].OpenEmployee)</td>
+                <td>@Html.DisplayFor(model => model[i].StaffQuantity)</td>
+                <td>@Html.DisplayFor(model => model[i].StaffQuantityBuisy)</td>
+                <td>@Html.DisplayFor(model => model[i].SummClosed)</td>
+                <td>@Html.DisplayFor(model => model[i].SummInWork)</td>
+                <td>@Html.DisplayFor(model => model[i].BOQuantity)</td>
+                <td>
+                    @Html.ActionLink("Детально", "Details", new { Id = Model[i].Id }, new { @class = "btn btn-outline-info" })
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
