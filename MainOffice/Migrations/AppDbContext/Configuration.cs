@@ -22,46 +22,46 @@ namespace MainOffice.Migrations.AppDbContext
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
             context.BarberLevels.AddOrUpdate(p => p.Name,
-                new BarberLevel { Name = "VIP Майстер", OrderNumber = 4, Color = "E87701" },
-                new BarberLevel { Name = "Високої Кваліфікації", OrderNumber = 8, Color = "7F00BA" },
-                new BarberLevel { Name = "Авторський Майстер", OrderNumber = 6, Color = "146400" },
-                new BarberLevel { Name = "Гранд Майстер", OrderNumber = 3, Color = "E23C02" },
-                new BarberLevel { Name = "Стиль Директор", OrderNumber = 1, Color = "20FF00" },
-                new BarberLevel { Name = "Майстер Року", OrderNumber = 7, Color = "00CBC9" },
-                new BarberLevel { Name = "Топ Майстер", OrderNumber = 2, Color = "9B2800" },
-                new BarberLevel { Name = "Стиль Майстер", OrderNumber = 5, Color = "E8E701" });
+                new BarberLevel { Name = "VIP РњР°Р№СЃС‚РµСЂ", OrderNumber = 4, Color = "E87701" },
+                new BarberLevel { Name = "Р’РёСЃРѕРєРѕС— РљРІР°Р»С–С„С–РєР°С†С–С—", OrderNumber = 8, Color = "7F00BA" },
+                new BarberLevel { Name = "РђРІС‚РѕСЂСЃСЊРєРёР№ РњР°Р№СЃС‚РµСЂ", OrderNumber = 6, Color = "146400" },
+                new BarberLevel { Name = "Р“СЂР°РЅРґ РњР°Р№СЃС‚РµСЂ", OrderNumber = 3, Color = "E23C02" },
+                new BarberLevel { Name = "РЎС‚РёР»СЊ Р”РёСЂРµРєС‚РѕСЂ", OrderNumber = 1, Color = "20FF00" },
+                new BarberLevel { Name = "РњР°Р№СЃС‚РµСЂ Р РѕРєСѓ", OrderNumber = 7, Color = "00CBC9" },
+                new BarberLevel { Name = "РўРѕРї РњР°Р№СЃС‚РµСЂ", OrderNumber = 2, Color = "9B2800" },
+                new BarberLevel { Name = "РЎС‚РёР»СЊ РњР°Р№СЃС‚РµСЂ", OrderNumber = 5, Color = "E8E701" });
 
             context.Companies.AddOrUpdate(p => p.Name,
-                new Company { Name = "Крокус", Address = "м. Київ, Харківське шосе, 53" },
-                new Company { Name = "Крокус І", Address = "м. Київ, Попудренко, 7Ж" },
-                new Company { Name = "Крокус ІІ", Address = "м. Київ, Політехнічний пров., 1/33" },
-                new Company { Name = "Аспазія", Address = "м. Київ, Маршала Тимошенко, 19" });
+                new Company { Name = "РљСЂРѕРєСѓСЃ", Address = "Рј. РљРёС—РІ, РҐР°СЂРєС–РІСЃСЊРєРµ С€РѕСЃРµ, 53" },
+                new Company { Name = "РљСЂРѕРєСѓСЃ Р†", Address = "Рј. РљРёС—РІ, РџРѕРїСѓРґСЂРµРЅРєРѕ, 7Р–" },
+                new Company { Name = "РљСЂРѕРєСѓСЃ Р†Р†", Address = "Рј. РљРёС—РІ, РџРѕР»С–С‚РµС…РЅС–С‡РЅРёР№ РїСЂРѕРІ., 1/33" },
+                new Company { Name = "РђСЃРїР°Р·С–СЏ", Address = "Рј. РљРёС—РІ, РњР°СЂС€Р°Р»Р° РўРёРјРѕС€РµРЅРєРѕ, 19" });
 
             context.Professions.AddOrUpdate(p => p.Name,
-                new Profession { Name = "Адміністратор салона", OrderNumber = 6, Color = "FF7931" }, //9 - 1
-                new Profession { Name = "Перукар", OrderNumber = 1, Color = "6DFF31" }, //2
-                new Profession { Name = "Майстер манікюра", OrderNumber = 2, Color = "FC31FF" }, //3
-                new Profession { Name = "Косметич. послуг", OrderNumber = 3, Color = "31FF90" }, //4
-                new Profession { Name = "Майстер епіляції", OrderNumber = 4, Color = "FFD631" }, //5
-                new Profession { Name = "Масажист", OrderNumber = 5, Color = "3231FF" }); //10 - 6
+                new Profession { Name = "РђРґРјС–РЅС–СЃС‚СЂР°С‚РѕСЂ СЃР°Р»РѕРЅР°", OrderNumber = 6, Color = "FF7931" }, //9 - 1
+                new Profession { Name = "РџРµСЂСѓРєР°СЂ", OrderNumber = 1, Color = "6DFF31" }, //2
+                new Profession { Name = "РњР°Р№СЃС‚РµСЂ РјР°РЅС–РєСЋСЂР°", OrderNumber = 2, Color = "FC31FF" }, //3
+                new Profession { Name = "РљРѕСЃРјРµС‚РёС‡. РїРѕСЃР»СѓРі", OrderNumber = 3, Color = "31FF90" }, //4
+                new Profession { Name = "РњР°Р№СЃС‚РµСЂ РµРїС–Р»СЏС†С–С—", OrderNumber = 4, Color = "FFD631" }, //5
+                new Profession { Name = "РњР°СЃР°Р¶РёСЃС‚", OrderNumber = 5, Color = "3231FF" }); //10 - 6
 
             context.SalonStates.AddOrUpdate(p => p.Name,
-                new SalonState { Name = "Діючий" },
-                new SalonState { Name = "Зачинен назавжди" });
+                new SalonState { Name = "Р”С–СЋС‡РёР№" },
+                new SalonState { Name = "Р—Р°С‡РёРЅРµРЅ РЅР°Р·Р°РІР¶РґРё" });
 
             context.SalonTypes.AddOrUpdate(p => p.Name,
-                new SalonType { Name = "Салон краси" },
-                new SalonType { Name = "Перукарня" });
+                new SalonType { Name = "РЎР°Р»РѕРЅ РєСЂР°СЃРё" },
+                new SalonType { Name = "РџРµСЂСѓРєР°СЂРЅСЏ" });
 
             context.SaveChanges();
             
             context.Salons.AddOrUpdate(p => p.Name,
-                new Salon { Name = "метро Печерська", Address = "Київ, бул. Лесі Ураїнки, 21Б", PhoneNumber1 = "(093) 474-54-04", PhoneNumber2 = "(044) 285-05-15", SalonStateId = 1, SalonTypeId = 2, Latitude = 50.425100, Longitude = 30.543337, IP = "195.177.73.220" }, //11 - 1
-                new Salon { Name = "метро Мінська", Address = "Київ, вул. Тимошенко, 19", PhoneNumber1 = "(063) 445-61-11", PhoneNumber2 = "(044) 502-36-33", SalonStateId = 1, SalonTypeId = 2, Latitude = 50.513797, Longitude = 30.496843, IP = "82.193.119.150" }, //2
-                new Salon { Name = "метро Політехнічний інститут", Address = "Київ, проспект Перемоги, 33", PhoneNumber1 = "(063) 619-18-06", PhoneNumber2 = "(044) 489-16-03", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.450526, Longitude = 30.467049, IP = "134.249.184.209" }, //3
-                new Salon { Name = "метро Вокзальна", Address = "Київ, вул. Пестеля, 11", PhoneNumber1 = "(063) 619-18-07", PhoneNumber2 = "(044) 236-82-26", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.444859, Longitude = 30.489859, IP = "195.60.229.67" }, //4
-                new Salon { Name = "масив Райдужний", Address = "Київ, вул. Райдужна, 15", PhoneNumber1 = "(063) 619-18-09", PhoneNumber2 = "(044) 542-24-37", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.486521, Longitude = 30.585064, IP = "94.45.65.55" }, //10 - 5
-                new Salon { Name = "метро Дарниця", Address = "Київ, вул. Попудренко, 7Ж", PhoneNumber1 = "(063) 619-18-10", PhoneNumber2 = "(044) 296-82-94", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.455733, Longitude = 30.613638, IP = "195.49.151.152" }); //9 - 6
+                new Salon { Name = "РјРµС‚СЂРѕ РџРµС‡РµСЂСЃСЊРєР°", Address = "РљРёС—РІ, Р±СѓР». Р›РµСЃС– РЈСЂР°С—РЅРєРё, 21Р‘", PhoneNumber1 = "(093) 474-54-04", PhoneNumber2 = "(044) 285-05-15", SalonStateId = 1, SalonTypeId = 2, Latitude = 50.425100, Longitude = 30.543337, IP = "195.177.73.220" }, //11 - 1
+                new Salon { Name = "РјРµС‚СЂРѕ РњС–РЅСЃСЊРєР°", Address = "РљРёС—РІ, РІСѓР». РўРёРјРѕС€РµРЅРєРѕ, 19", PhoneNumber1 = "(063) 445-61-11", PhoneNumber2 = "(044) 502-36-33", SalonStateId = 1, SalonTypeId = 2, Latitude = 50.513797, Longitude = 30.496843, IP = "82.193.119.150" }, //2
+                new Salon { Name = "РјРµС‚СЂРѕ РџРѕР»С–С‚РµС…РЅС–С‡РЅРёР№ С–РЅСЃС‚РёС‚СѓС‚", Address = "РљРёС—РІ, РїСЂРѕСЃРїРµРєС‚ РџРµСЂРµРјРѕРіРё, 33", PhoneNumber1 = "(063) 619-18-06", PhoneNumber2 = "(044) 489-16-03", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.450526, Longitude = 30.467049, IP = "134.249.184.209" }, //3
+                new Salon { Name = "РјРµС‚СЂРѕ Р’РѕРєР·Р°Р»СЊРЅР°", Address = "РљРёС—РІ, РІСѓР». РџРµСЃС‚РµР»СЏ, 11", PhoneNumber1 = "(063) 619-18-07", PhoneNumber2 = "(044) 236-82-26", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.444859, Longitude = 30.489859, IP = "195.60.229.67" }, //4
+                new Salon { Name = "РјР°СЃРёРІ Р Р°Р№РґСѓР¶РЅРёР№", Address = "РљРёС—РІ, РІСѓР». Р Р°Р№РґСѓР¶РЅР°, 15", PhoneNumber1 = "(063) 619-18-09", PhoneNumber2 = "(044) 542-24-37", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.486521, Longitude = 30.585064, IP = "94.45.65.55" }, //10 - 5
+                new Salon { Name = "РјРµС‚СЂРѕ Р”Р°СЂРЅРёС†СЏ", Address = "РљРёС—РІ, РІСѓР». РџРѕРїСѓРґСЂРµРЅРєРѕ, 7Р–", PhoneNumber1 = "(063) 619-18-10", PhoneNumber2 = "(044) 296-82-94", SalonStateId = 1, SalonTypeId = 1, Latitude = 50.455733, Longitude = 30.613638, IP = "195.49.151.152" }); //9 - 6
 
             context.Trademarks.AddOrUpdate(p => p.Name,
                 new Trademark { Name = "BES" },
@@ -72,16 +72,16 @@ namespace MainOffice.Migrations.AppDbContext
             context.Promotions.AddOrUpdate(p => p.Name,
                 new Promotion { Name = "10%" },
                 new Promotion { Name = "50%" },
-                new Promotion { Name = "Сотрудник" });
+                new Promotion { Name = "РЎРѕС‚СЂСѓРґРЅРёРє" });
 
-            /*Sql("INSERT INTO dbo.PStatus (Name,Symbol,IsHidden) VALUES ('Каса','THK',0)");
-            Sql("INSERT INTO dbo.PStatus (Name,Symbol,IsHidden) VALUES ('Термінал','THT',0)");
-            Sql("INSERT INTO dbo.PStatus (Name,Symbol,IsHidden) VALUES ('Депозит','THД',1)");*/
+            /*Sql("INSERT INTO dbo.PStatus (Name,Symbol,IsHidden) VALUES ('РљР°СЃР°','THK',0)");
+            Sql("INSERT INTO dbo.PStatus (Name,Symbol,IsHidden) VALUES ('РўРµСЂРјС–РЅР°Р»','THT',0)");
+            Sql("INSERT INTO dbo.PStatus (Name,Symbol,IsHidden) VALUES ('Р”РµРїРѕР·РёС‚','THР”',1)");*/
 
             context.PStatuses.AddOrUpdate(p => p.Name,
-                new PStatus { Name = "Каса", Symbol = "THK", IsHidden = false },
-                new PStatus { Name = "Термінал", Symbol = "THT", IsHidden = false },
-                new PStatus { Name = "Депозит", Symbol = "THД", IsHidden = true });
+                new PStatus { Name = "РљР°СЃР°", Symbol = "THK", IsHidden = false },
+                new PStatus { Name = "РўРµСЂРјС–РЅР°Р»", Symbol = "THT", IsHidden = false },
+                new PStatus { Name = "Р”РµРїРѕР·РёС‚", Symbol = "THР”", IsHidden = true });
 
             context.SaveChanges();
         }

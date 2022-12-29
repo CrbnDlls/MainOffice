@@ -93,8 +93,8 @@ namespace MainOffice.Migrations.ApplicationDbContext
 
 
             context.Localities.AddOrUpdate(p => p.Name,
-                new Locality { Name = "uk-UA", Language = "Українська" },
-                new Locality { Name = "ru-RU", Language = "Русский" });
+                new Locality { Name = "uk-UA", Language = "РЈРєСЂР°С—РЅСЃСЊРєР°" },
+                new Locality { Name = "ru-RU", Language = "Р СѓСЃСЃРєРёР№" });
 
             context.SaveChanges();
         }
